@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fill for the battery / time-left bars. Level 0..10000 = 0..100% width; tinted via setColorFilter. -->
+<clip xmlns:android="http://schemas.android.com/apk/res/android"
+    android:clipOrientation="horizontal"
+    android:gravity="start">
+    <shape android:shape="rectangle">
+        <solid android:color="#FFFFFFFF" />
+    </shape>
+</clip>

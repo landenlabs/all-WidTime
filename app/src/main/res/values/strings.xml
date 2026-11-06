@@ -1,0 +1,54 @@
+<resources>
+    <string name="app_name">all World Time</string>
+    <string name="widget_description">Shows the current date and time for cities you choose from around the world.</string>
+    <string name="widget_empty">Tap to add cities</string>
+    <string name="format_error">Invalid format</string>
+    <string name="invalid_pattern">Invalid pattern</string>
+
+    <string name="config_title">Configure WidTime</string>
+    <string name="add_city">Add city</string>
+    <string name="save">Save</string>
+    <string name="remove">Remove</string>
+    <string name="section_cities">Cities</string>
+    <string name="section_appearance">Appearance</string>
+    <string name="preview_label">Preview</string>
+    <string name="text_color_label">Text color</string>
+    <string name="text_size_label">Text size</string>
+    <string name="date_format_label">Date/time format (DateTimeFormatter pattern)</string>
+    <string name="date_format_hint">e.g. EEE d MMM, HH:mm</string>
+    <string name="format_help">Pattern letters follow java.time.format.DateTimeFormatter: yyyy=year, MM=month, dd=day, EEE=weekday, HH=24h hour, hh=12h hour, mm=minute. For am/pm: lowercase \'a\' forces lowercase (am/pm), uppercase \'A\' forces uppercase (AM/PM).</string>
+    <string name="no_cities_added">No cities added yet. Tap \"Add city\" to get started.</string>
+    <string name="preview_sample_city">New York</string>
+    <string name="section_background">Background</string>
+    <string name="bg_color_label">Background color</string>
+    <string name="bg_alpha_label">Background opacity</string>
+    <string name="section_battery">Battery</string>
+    <string name="battery_bar_label">Battery level bar (top)</string>
+    <string name="time_left_bar_label">Battery time left bar (bottom, full = 24 h)</string>
+    <string name="battery_bar_help">Green above 60%, yellow 40–60%, red below 40%. Time left is estimated from how fast the battery drains while unplugged, so it fills in after the level drops a couple of percent.</string>
+    <string name="section_charging">Charging</string>
+    <string name="charge_alerts_label">Charging pings &amp; unplug alarm</string>
+    <string name="charge_alerts_help">While charging the widget shows battery level, speed and current instead of the clocks. Pings every 2 min (5x), then every 5 min (5x), then every 10 min. When the charger is pulled, a 5 s alarm repeats every 5 min until you tap Stop. Applies to all widgets and keeps a silent "Watching charger" notification.</string>
+    <string name="channel_monitor">Charger monitor</string>
+    <string name="channel_alarm">Charger disconnected alarm</string>
+    <string name="monitor_notification_title">Watching charger</string>
+    <string name="monitor_notification_text">Pings while charging, alarms if unplugged</string>
+    <string name="alarm_title">Charger disconnected</string>
+    <string name="alarm_text">The alarm repeats every 5 minutes until you stop it.</string>
+    <string name="alarm_not_active">No charger alarm is active.</string>
+    <string name="stop_alarm">Stop alarm</string>
+    <string name="close">Close</string>
+    <string name="widget_alarm_headline">⚠ Charger disconnected</string>
+    <string name="widget_alarm_detail">Tap to stop alarm</string>
+    <string name="charging_headline">⚡ %1$d%% · Charging</string>
+    <string name="charged_headline">⚡ %1$d%% · Fully charged</string>
+
+    <string name="search_city_title">Add a city</string>
+    <string name="search_city_hint">Search city or country</string>
+    <string name="manual_entry_toggle">Can\'t find your city? Enter it manually</string>
+    <string name="manual_city_label_hint">City or place name</string>
+    <string name="manual_offset_hint">UTC offset, e.g. +05:30, -08:00, Z</string>
+    <string name="use_manual_entry">Use this location</string>
+    <string name="invalid_offset">Enter a valid UTC offset, e.g. +05:30 or Z</string>
+    <string name="no_matches">No matching cities. Try manual entry below.</string>
+</resources>

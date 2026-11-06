@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/config_title"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/section_cities"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/city_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:id="@+id/no_cities_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/no_cities_added"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/add_city_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/add_city" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="#33000000" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/section_appearance"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/text_color_label" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/swatch_white"
+                style="@style/ColorSwatchStyle"
+                android:backgroundTint="@color/swatch_white"
+                android:contentDescription="@string/text_color_label" />
+
+            <ImageButton
+                android:id="@+id/swatch_black"
+                style="@style/ColorSwatchStyle"
+                android:backgroundTint="@color/swatch_black"
+                android:contentDescription="@string/text_color_label" />
+
+            <ImageButton
+                android:id="@+id/swatch_yellow"
+                style="@style/ColorSwatchStyle"
+                android:backgroundTint="@color/swatch_yellow"
+                android:contentDescription="@string/text_color_label" />
+
+            <ImageButton
+                android:id="@+id/swatch_red"
+                style="@style/ColorSwatchStyle"
+                android:backgroundTint="@color/swatch_red"
+                android:contentDescription="@string/text_color_label" />
+
+            <ImageButton
+                android:id="@+id/swatch_cyan"
+                style="@style/ColorSwatchStyle"
+                android:backgroundTint="@color/swatch_cyan"
+                android:contentDescription="@string/text_color_label" />
+
+            <ImageButton
+                android:id="@+id/swatch_green"
+                style="@style/ColorSwatchStyle"
+                android:backgroundTint="@color/swatch_green"
+                android:contentDescription="@string/text_color_label" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/hex_color_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="#RRGGBB"
+            android:inputType="text"
+            android:maxLength="7" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/text_size_label" />
+
+        <SeekBar
+            android:id="@+id/text_size_slider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="32" />
+
+        <TextView
+            android:id="@+id/text_size_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/date_format_label" />
+
+        <EditText
+            android:id="@+id/pattern_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/date_format_hint"
+            android:inputType="text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/format_help"
+            android:textSize="11sp"
+            android:textColor="#88000000" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/preview_label"
+            android:textSize="12sp"
+            android:textColor="#88000000" />
+
+        <LinearLayout
+            android:id="@+id/preview_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/preview_battery_bar"
+                style="@style/BatteryBarStyle"
+                android:contentDescription="@string/battery_bar_label" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="4dp">
+
+                <include layout="@layout/widget_time_item" />
+            </FrameLayout>
+
+            <ImageView
+                android:id="@+id/preview_time_left_bar"
+                style="@style/BatteryBarStyle"
+                android:contentDescription="@string/time_left_bar_label" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="#33000000" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/section_background"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/bg_color_label" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/bg_swatch_white"
+                style="@style/ColorSwatchStyle"
+                android:backgroundTint="@color/swatch_white"
+                android:contentDescription="@string/bg_color_label" />
+
+            <ImageButton
+                android:id="@+id/bg_swatch_black"
+                style="@style/ColorSwatchStyle"
+                android:backgroundTint="@color/swatch_black"
+                android:contentDescription="@string/bg_color_label" />
+
+            <ImageButton
+                android:id="@+id/bg_swatch_yellow"
+                style="@style/ColorSwatchStyle"
+                android:backgroundTint="@color/swatch_yellow"
+                android:contentDescription="@string/bg_color_label" />
+
+            <ImageButton
+                android:id="@+id/bg_swatch_red"
+                style="@style/ColorSwatchStyle"
+                android:backgroundTint="@color/swatch_red"
+                android:contentDescription="@string/bg_color_label" />
+
+            <ImageButton
+                android:id="@+id/bg_swatch_cyan"
+                style="@style/ColorSwatchStyle"
+                android:backgroundTint="@color/swatch_cyan"
+                android:contentDescription="@string/bg_color_label" />
+
+            <ImageButton
+                android:id="@+id/bg_swatch_green"
+                style="@style/ColorSwatchStyle"
+                android:backgroundTint="@color/swatch_green"
+                android:contentDescription="@string/bg_color_label" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/bg_hex_color_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="#RRGGBB"
+            android:inputType="text"
+            android:maxLength="7" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/bg_alpha_label" />
+
+        <SeekBar
+            android:id="@+id/bg_alpha_slider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="255" />
+
+        <TextView
+            android:id="@+id/bg_alpha_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="#33000000" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/section_battery"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <CheckBox
+            android:id="@+id/show_battery_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/battery_bar_label" />
+
+        <CheckBox
+            android:id="@+id/show_time_left_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/time_left_bar_label" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/battery_bar_help"
+            android:textSize="11sp"
+            android:textColor="#88000000" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="#33000000" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/section_charging"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <CheckBox
+            android:id="@+id/charge_alerts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/charge_alerts_label" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/charge_alerts_help"
+            android:textSize="11sp"
+            android:textColor="#88000000" />
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/save" />
+
+    </LinearLayout>
+</ScrollView>

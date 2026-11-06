@@ -1,0 +1,9 @@
+<resources>
+    <color name="widget_bg">#CC202020</color>
+    <color name="swatch_white">#FFFFFFFF</color>
+    <color name="swatch_black">#FF000000</color>
+    <color name="swatch_yellow">#FFFFD54F</color>
+    <color name="swatch_red">#FFEF5350</color>
+    <color name="swatch_cyan">#FF4DD0E1</color>
+    <color name="swatch_green">#FF81C784</color>
+</resources>
