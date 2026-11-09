@@ -164,6 +164,20 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
         ChargeAlerts.syncService(this);
     }
 
+    /**
+     * After a rotation, Android restores the views' state (e.g. the hex text) after onCreate. The
+     * values match what's stored, so don't treat the resulting listener callbacks as user edits.
+     */
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        binding = true;
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+        } finally {
+            binding = false;
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -382,6 +396,9 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
             }
             // Started from this foreground screen, which Android 12+ requires for foreground services.
             ChargeAlerts.setEnabled(this, checked);
+            if (checked) {
+                ChargeAlerts.previewAlarm(this); // Let the user hear what the unplug alarm sounds like.
+            }
             if (checked && Build.VERSION.SDK_INT >= 33
                     && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
@@ -412,6 +429,9 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
                 }
                 // Started from this foreground screen, which Android 12+ requires for foreground services.
                 ChargeAlerts.setSpeakStep(WidgetConfigActivity.this, step);
+                if (step > 0) {
+                    ChargeAlerts.previewSpeech(WidgetConfigActivity.this); // Sample of the voice and volume.
+                }
                 saved();
             }
 

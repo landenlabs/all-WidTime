@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Narrow screens (phones): one scrolling column. See layout-w600dp for the two-column version. -->
+<!-- Narrow screens (phones): one scrolling column. layout-w600dp is the same column with more
+     breathing room for portrait tablets; layout-w600dp-land is the two-column landscape version. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"

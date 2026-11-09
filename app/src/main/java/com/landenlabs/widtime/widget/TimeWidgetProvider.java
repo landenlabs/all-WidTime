@@ -18,6 +18,7 @@ import com.landenlabs.widtime.alerts.ChargeAlerts;
 import com.landenlabs.widtime.model.CityEntry;
 import com.landenlabs.widtime.ui.WidgetConfigActivity;
 import com.landenlabs.widtime.util.BatteryStatus;
+import com.landenlabs.widtime.util.ChargeLogic;
 import com.landenlabs.widtime.util.ChargingInfo;
 import com.landenlabs.widtime.util.DischargeEstimator;
 import com.landenlabs.widtime.util.WidgetPrefs;
@@ -125,7 +126,8 @@ public class TimeWidgetProvider extends AppWidgetProvider {
                                           BatteryStatus status, ChargingInfo charging, boolean alarm) {
         applyBatteryBars(context, views, widgetId, status, charging.plugged);
 
-        boolean showCharging = !alarm && charging.plugged;
+        // At 100% the charge is done: back to the clocks (the battery bar stays while plugged).
+        boolean showCharging = !alarm && charging.plugged && !ChargeLogic.isFull(charging.levelPercent);
         views.setViewVisibility(R.id.alarm_panel, alarm ? View.VISIBLE : View.GONE);
         views.setViewVisibility(R.id.charging_panel, showCharging ? View.VISIBLE : View.GONE);
         views.setViewVisibility(R.id.city_area, alarm || showCharging ? View.GONE : View.VISIBLE);

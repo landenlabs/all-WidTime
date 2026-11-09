@@ -24,12 +24,13 @@
     <string name="battery_bar_help">Green above 60%, yellow 40–60%, red below 40%. Time left is estimated from how fast the battery drains while unplugged, so it fills in after the level drops a couple of percent.</string>
     <string name="section_charging">Charging</string>
     <string name="charge_alerts_label">Charging pings &amp; unplug alarm</string>
-    <string name="charge_alerts_help">While charging the widget shows battery level, speed and current instead of the clocks. Pings every 2 min (5x), then every 5 min (5x), then every 10 min. When the charger is pulled, a 5 s alarm repeats every 5 min until you tap Stop. Tap the bell on the charging widget to mute charging sounds for the current charge only. Applies to all widgets and keeps a silent "Watching charger" notification.</string>
+    <string name="charge_alerts_help">While charging the widget shows battery level, speed and current instead of the clocks. Pings every 2 min (5x), then every 5 min (5x), then every 10 min. When the charger is pulled, a 5 s alarm repeats every 5 min until you tap Stop. At 100% the widget shows the clocks again; after one final ping (or “Fully charged”), pings, speech and the unplug alarm stay quiet until the next charge. Tap the bell on the charging widget to mute charging sounds for the current charge only. Applies to all widgets and keeps a silent "Watching charger" notification.</string>
     <string name="speak_label">Speak battery %</string>
     <string name="speak_off">Off</string>
     <string name="speak_step">Every %1$d%%</string>
     <string name="speak_help">While charging, says “Charged to 30 percent” each time the battery reaches the next step. A big jump is announced once, at the actual level (e.g. 9% to 22% says 22). Uses the notification volume and the phone’s text-to-speech voice.</string>
     <string name="speak_charged">Charged to %1$d percent</string>
+    <string name="speak_test">Voice test. Charged to %1$d percent</string>
     <string name="speak_full">Fully charged</string>
     <string name="channel_monitor">Charger monitor</string>
     <string name="channel_alarm">Charger disconnected alarm</string>

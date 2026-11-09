@@ -81,8 +81,10 @@ Paths are under `app/src/main/java/com/landenlabs/widtime/`.
 
 ### Charging panel (widget)
 
-- **When it shows.** It replaces the city list while plugged in, unless the unplug alarm is
-  active, in which case the alarm panel wins. It takes the first visible city's color and size.
+- **When it shows.** It replaces the city list while plugged in and below 100%
+  (`ChargeLogic.isFull`), unless the unplug alarm is active, in which case the alarm panel wins.
+  At 100% the city list (date/time) comes back; the battery bar stays while plugged. It takes
+  the first visible city's color and size.
 - **Layout.** Left-justified text column; bell `ImageView` on the right edge.
   - Headline: `⚡ 85% · Charging` or `Fully charged`.
   - Detail: speed, source and current, e.g. `Fast · USB · 1.85 A`.
@@ -128,6 +130,14 @@ Paths are under `app/src/main/java/com/landenlabs/widtime/`.
 
   It repeats until Stop (from the notification, `AlarmActivity`, or the widget's alarm panel) or
   until the charger is reconnected.
+- **Full charge (100%).** One notice, then quiet. The first ping due at 100%, or the
+  "Fully charged" announcement, sets `full_alert_done` and cancels the ping schedule. That
+  applies even if the session is muted, so unmuting later doesn't ping. While it's set:
+  - no pings and no speech;
+  - unplugging doesn't sound the alarm.
+
+  It's cleared when a new charge starts (`onPowerConnected`), on disconnect (after the alarm
+  check), on boot, and when the monitor service stops.
 - **Exact alarms.** `SCHEDULE_EXACT_ALARM` is off by default on Android 14+. Without it,
   scheduling falls back to `setAndAllowWhileIdle`, which can run minutes late. Settings shows an
   "Allow exact alarms" button in that case.

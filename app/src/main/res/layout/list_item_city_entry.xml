@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- One city in the settings list (narrow screens): the preview takes two lines - name and UTC
-     offset, then the time. layout-w600dp has a one-line version. The preview tile is drawn on the
+     offset, then the time. layout-w600dp (tablets, wide landscape) has a one-line version. The preview tile is drawn on the
      widget's background color in that city's own text color, size and format. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"

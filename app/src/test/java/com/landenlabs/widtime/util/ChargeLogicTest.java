@@ -22,6 +22,13 @@ public class ChargeLogicTest {
     }
 
     @Test
+    public void fullAtHundredPercent() {
+        assertTrue(ChargeLogic.isFull(100));
+        assertTrue(!ChargeLogic.isFull(99));
+        assertTrue(!ChargeLogic.isFull(-1));
+    }
+
+    @Test
     public void alarmTiming() {
         assertEquals(5_000L, ChargeLogic.ALARM_PLAY_MILLIS);
         assertEquals(5 * MIN, ChargeLogic.ALARM_PAUSE_MILLIS);

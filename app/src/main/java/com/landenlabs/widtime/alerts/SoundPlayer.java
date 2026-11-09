@@ -39,9 +39,14 @@ final class SoundPlayer {
     }
 
     /** The user's default alarm sound for {@link ChargeLogic#ALARM_PLAY_MILLIS}, on the alarm stream. */
-    static synchronized void playAlarm(Context context) {
+    static void playAlarm(Context context) {
+        playAlarm(context, ChargeLogic.ALARM_PLAY_MILLIS);
+    }
+
+    /** The same alarm sound as {@link #playAlarm(Context)}, cut to {@code millis} (settings preview). */
+    static synchronized void playAlarm(Context context, long millis) {
         stopAlarm();
-        wakeFor(context, ChargeLogic.ALARM_PLAY_MILLIS + 1000);
+        wakeFor(context, millis + 1000);
         Context app = context.getApplicationContext();
         Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         try {
@@ -59,12 +64,12 @@ final class SoundPlayer {
             // No alarm sound configured or it can't be read: fall back to a generated tone.
             try {
                 alarmTone = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
-                alarmTone.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, (int) ChargeLogic.ALARM_PLAY_MILLIS);
+                alarmTone.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, (int) millis);
             } catch (RuntimeException ignored) {
                 alarmTone = null;
             }
         }
-        MAIN.postDelayed(STOP_ALARM, ChargeLogic.ALARM_PLAY_MILLIS);
+        MAIN.postDelayed(STOP_ALARM, millis);
     }
 
     static synchronized void stopAlarm() {

@@ -79,6 +79,15 @@ public final class ChargeLogic {
         return maxMicroAmps / 1_000_000.0 * volts;
     }
 
+    /**
+     * At 100% a charge is treated as done: the widget shows the clocks again and, after one
+     * final ping or "Fully charged", pings, speech and the unplug alarm stay quiet until the next
+     * charge. Unknown levels (-1) are never full.
+     */
+    public static boolean isFull(int levelPercent) {
+        return levelPercent >= 100;
+    }
+
     /** "Speak battery %" choices; 0 = off (the default). */
     public static final int[] SPEAK_STEPS = {0, 5, 10, 20, 25};
 

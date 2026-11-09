@@ -57,8 +57,15 @@ public final class ChargeAlerts {
     /** Highest level / step announced (or passed) this charge; -1 until the first reading. */
     private static final String KEY_SPEAK_MARK = "speak_mark";
     private static final String KEY_LAST_SPOKEN = "last_spoken_millis";
+    /**
+     * Set once the 100% ping or "Fully charged" has played (or would have, if muted). After that,
+     * pings, speech and the unplug alarm stay quiet until the next charging session starts.
+     */
+    private static final String KEY_FULL_DONE = "full_alert_done";
     /** A ping this soon after an announcement is silent, so the two don't overlap. */
     private static final long PING_AFTER_SPEECH_GAP_MILLIS = 60_000L;
+    /** How long the settings screen plays the alarm sound when the alarm is switched on. */
+    private static final long PREVIEW_ALARM_MILLIS = 2_000L;
 
     private ChargeAlerts() {
     }
@@ -86,6 +93,17 @@ public final class ChargeAlerts {
         syncService(context);
     }
 
+    /** Settings preview: the unplug alarm's sound, cut short. */
+    public static void previewAlarm(Context context) {
+        SoundPlayer.playAlarm(context, PREVIEW_ALARM_MILLIS);
+    }
+
+    /** Settings preview: a sample announcement at the current battery level, with the real voice. */
+    public static void previewSpeech(Context context) {
+        int level = ChargingInfo.read(context).levelPercent;
+        Speaker.speak(context, context.getString(R.string.speak_test, level >= 0 ? level : 50));
+    }
+
     /** Pings, unplug alarm, or speech: whether the widget's charging bell has anything to mute. */
     public static boolean hasChargingSounds(Context context) {
         return isEnabled(context) || getSpeakStep(context) > 0;
@@ -104,6 +122,17 @@ public final class ChargeAlerts {
     static void toggleSessionMuted(Context context) {
         prefs(context).edit().putBoolean(KEY_MUTED, !isSessionMuted(context)).apply();
         TimeWidgetProvider.refreshAll(context);
+    }
+
+    /** True once this charge reached 100% and its single "full" ping / announcement is done. */
+    public static boolean isFullAlertDone(Context context) {
+        return prefs(context).getBoolean(KEY_FULL_DONE, false);
+    }
+
+    /** The final 100% notice was given: stop the ping schedule for the rest of this charge. */
+    private static void markFullAlertDone(Context context) {
+        prefs(context).edit().putBoolean(KEY_FULL_DONE, true).apply();
+        cancel(context, ACTION_PING);
     }
 
     public static PendingIntent toggleMuteIntent(Context context) {
@@ -136,14 +165,16 @@ public final class ChargeAlerts {
             }
         } else {
             context.stopService(service);
-            prefs(context).edit().putBoolean(KEY_MUTED, false).putInt(KEY_SPEAK_MARK, -1).apply();
+            prefs(context).edit().putBoolean(KEY_MUTED, false).putBoolean(KEY_FULL_DONE, false)
+                    .putInt(KEY_SPEAK_MARK, -1).apply();
         }
     }
 
     /** Alarms and in-flight sessions don't survive a reboot. */
     public static void onBoot(Context context) {
         prefs(context).edit().putBoolean(KEY_SESSION, false).putBoolean(KEY_ALARM, false)
-                .putBoolean(KEY_MUTED, false).putInt(KEY_SPEAK_MARK, -1).apply();
+                .putBoolean(KEY_MUTED, false).putBoolean(KEY_FULL_DONE, false)
+                .putInt(KEY_SPEAK_MARK, -1).apply();
     }
 
     /** Catch up on plug/unplug that happened while the monitor wasn't running. */
@@ -165,6 +196,10 @@ public final class ChargeAlerts {
             stopAlarm(context);
         }
         SharedPreferences p = prefs(context);
+        if (!p.getBoolean(KEY_SESSION, false)) {
+            // A new charge (speech-only mode never sets KEY_SESSION) re-arms the 100% notice.
+            p.edit().putBoolean(KEY_FULL_DONE, false).apply();
+        }
         if (isEnabled(context) && !p.getBoolean(KEY_SESSION, false)) {
             p.edit().putBoolean(KEY_SESSION, true).putInt(KEY_PINGS, 0).putBoolean(KEY_MUTED, false).apply();
             schedule(context, ACTION_PING, System.currentTimeMillis() + ChargeLogic.pingDelayMillis(0), false);
@@ -175,9 +210,11 @@ public final class ChargeAlerts {
     static void onPowerDisconnected(Context context) {
         cancel(context, ACTION_PING);
         boolean muted = isSessionMuted(context);
-        // The mute only covers the charge that just ended.
-        prefs(context).edit().putBoolean(KEY_SESSION, false).putBoolean(KEY_MUTED, false).apply();
-        if (isEnabled(context) && !muted) {
+        boolean fullDone = isFullAlertDone(context);
+        // The mute and the 100% notice only cover the charge that just ended.
+        prefs(context).edit().putBoolean(KEY_SESSION, false).putBoolean(KEY_MUTED, false)
+                .putBoolean(KEY_FULL_DONE, false).apply();
+        if (isEnabled(context) && !muted && !fullDone) {
             prefs(context).edit().putBoolean(KEY_ALARM, true).apply();
             SoundPlayer.playAlarm(context);
             scheduleNextAlarm(context);
@@ -191,14 +228,23 @@ public final class ChargeAlerts {
         if (!isEnabled(context) || !p.getBoolean(KEY_SESSION, false)) {
             return;
         }
-        if (!ChargingInfo.read(context).plugged) {
+        ChargingInfo info = ChargingInfo.read(context);
+        if (!info.plugged) {
             // Missed the disconnect broadcast (monitor wasn't running).
             onPowerDisconnected(context);
             return;
         }
+        if (isFullAlertDone(context)) {
+            return; // Already said "full" this charge; no more pings until the next one.
+        }
         long sinceSpeech = System.currentTimeMillis() - p.getLong(KEY_LAST_SPOKEN, 0);
         if (!isSessionMuted(context) && sinceSpeech >= PING_AFTER_SPEECH_GAP_MILLIS) {
             SoundPlayer.playPing(context); // Skipped pings keep their schedule, so unmuting resumes it.
+        }
+        if (ChargeLogic.isFull(info.levelPercent)) {
+            markFullAlertDone(context); // That was the last ping of this charge.
+            TimeWidgetProvider.refreshAll(context);
+            return;
         }
         int played = p.getInt(KEY_PINGS, 0) + 1;
         p.edit().putInt(KEY_PINGS, played).apply();
@@ -225,12 +271,19 @@ public final class ChargeAlerts {
         if (next != mark) {
             p.edit().putInt(KEY_SPEAK_MARK, next).apply();
         }
+        if (!speak || isFullAlertDone(context)) {
+            return; // After the 100% notice, stay quiet until the next charge.
+        }
         // Muted steps still raise the mark, so unmuting doesn't announce a stale level.
-        if (speak && !isSessionMuted(context)) {
+        boolean full = ChargeLogic.isFull(levelPercent);
+        if (!isSessionMuted(context)) {
             p.edit().putLong(KEY_LAST_SPOKEN, System.currentTimeMillis()).apply();
-            Speaker.speak(context, levelPercent >= 100
+            Speaker.speak(context, full
                     ? context.getString(R.string.speak_full)
                     : context.getString(R.string.speak_charged, levelPercent));
+        }
+        if (full) {
+            markFullAlertDone(context); // "Fully charged" replaces any further pings.
         }
     }
 
