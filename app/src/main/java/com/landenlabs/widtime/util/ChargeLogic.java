@@ -79,6 +79,55 @@ public final class ChargeLogic {
         return maxMicroAmps / 1_000_000.0 * volts;
     }
 
+    /** "Speak battery %" choices; 0 = off (the default). */
+    public static final int[] SPEAK_STEPS = {0, 5, 10, 20, 25};
+
+    /**
+     * Whether to announce {@code level} while charging. {@code mark} is the highest
+     * {@code level / step} reached this charge, or -1 before the first reading (which only sets it,
+     * so plugging in at 47% stays quiet until 50%). Drops never speak and never lower the mark.
+     */
+    public static boolean shouldSpeak(int mark, int level, int step) {
+        return step > 0 && mark >= 0 && level >= 0 && level / step > mark;
+    }
+
+    /** The mark after seeing {@code level}: raised to its step, never lowered. */
+    public static int nextSpeakMark(int mark, int level, int step) {
+        if (step <= 0 || level < 0) {
+            return mark;
+        }
+        return Math.max(mark, level / step);
+    }
+
+    /** USB gadget functions (UsbManager USB_STATE boolean extras) worth showing, in display order. */
+    public static final String[] USB_FUNCTIONS = {"adb", "mtp", "ptp", "rndis", "ncm", "midi", "uvc", "accessory"};
+
+    /**
+     * Whether a wired charger also carries USB data. {@code connected} is UsbManager's USB_STATE
+     * "connected" extra: true only once a host has enumerated the phone over the data lines, so a
+     * charge-only cable or a wall charger reads false. Returns null for wireless / unplugged.
+     * e.g. "Power + data · ADB, MTP", "Power + data", "Power only · no data".
+     */
+    public static String usbDataLabel(boolean wired, boolean connected, java.util.List<String> activeFunctions) {
+        if (!wired) {
+            return null;
+        }
+        if (!connected) {
+            return "Power only · no data";
+        }
+        if (activeFunctions == null || activeFunctions.isEmpty()) {
+            return "Power + data";
+        }
+        StringBuilder sb = new StringBuilder("Power + data · ");
+        for (int i = 0; i < activeFunctions.size(); i++) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(activeFunctions.get(i).toUpperCase(java.util.Locale.ROOT));
+        }
+        return sb.toString();
+    }
+
     /** AOSP thresholds: under 5 W slow, 7.5 W and up fast; 20 W and up labelled super fast. */
     public static Speed speedForWatts(double watts) {
         if (Double.isNaN(watts) || watts <= 0) {

@@ -30,6 +30,9 @@ public class ChargeAlertReceiver extends BroadcastReceiver {
             case ChargeAlerts.ACTION_STOP_ALARM:
                 ChargeAlerts.stopAlarm(context);
                 break;
+            case ChargeAlerts.ACTION_TOGGLE_MUTE:
+                ChargeAlerts.toggleSessionMuted(context);
+                break;
             default:
                 return;
         }

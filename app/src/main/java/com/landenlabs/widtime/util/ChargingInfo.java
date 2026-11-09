@@ -5,12 +5,18 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /** Snapshot of the charger state: plugged, source, level, measured current, and speed label. */
 public final class ChargingInfo {
 
     // Not public API constants, but present in the battery intent on most devices (AOSP uses them).
     private static final String EXTRA_MAX_CHARGING_CURRENT = "max_charging_current";
     private static final String EXTRA_MAX_CHARGING_VOLTAGE = "max_charging_voltage";
+    /** Hidden UsbManager.ACTION_USB_STATE: sticky, sent on every USB connect / mode change. */
+    public static final String ACTION_USB_STATE = "android.hardware.usb.action.USB_STATE";
+    private static final String EXTRA_USB_CONNECTED = "connected";
 
     public final boolean plugged;
     public final boolean full;
@@ -22,22 +28,25 @@ public final class ChargingInfo {
     public final double currentMilliAmps;
     /** Null when neither charger capability nor measured power is available. */
     public final ChargeLogic.Speed speed;
+    /** Wired only: "Power only · no data" or "Power + data · ADB, MTP"; null otherwise. */
+    public final String usbData;
 
     private ChargingInfo(boolean plugged, boolean full, int levelPercent, String source,
-                         double currentMilliAmps, ChargeLogic.Speed speed) {
+                         double currentMilliAmps, ChargeLogic.Speed speed, String usbData) {
         this.plugged = plugged;
         this.full = full;
         this.levelPercent = levelPercent;
         this.source = source;
         this.currentMilliAmps = currentMilliAmps;
         this.speed = speed;
+        this.usbData = usbData;
     }
 
     public static ChargingInfo read(Context context) {
         Context app = context.getApplicationContext();
         Intent battery = app.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         if (battery == null) {
-            return new ChargingInfo(false, false, -1, null, Double.NaN, null);
+            return new ChargingInfo(false, false, -1, null, Double.NaN, null, null);
         }
         int plugType = battery.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0);
         boolean plugged = plugType != 0;
@@ -64,7 +73,27 @@ public final class ChargingInfo {
             }
             speed = ChargeLogic.speedForWatts(watts);
         }
-        return new ChargingInfo(plugged, full, level, sourceLabel(plugType), currentMa, speed);
+        boolean wired = plugged && plugType != BatteryManager.BATTERY_PLUGGED_WIRELESS;
+        String usbData = wired ? readUsbData(app) : null;
+        return new ChargingInfo(plugged, full, level, sourceLabel(plugType), currentMa, speed, usbData);
+    }
+
+    /** Data-line status from the sticky USB_STATE broadcast; null if the device never sent it. */
+    private static String readUsbData(Context app) {
+        Intent usb = app.registerReceiver(null, new IntentFilter(ACTION_USB_STATE));
+        if (usb == null) {
+            return null;
+        }
+        boolean connected = usb.getBooleanExtra(EXTRA_USB_CONNECTED, false);
+        List<String> functions = new ArrayList<>();
+        if (connected) {
+            for (String fn : ChargeLogic.USB_FUNCTIONS) {
+                if (usb.getBooleanExtra(fn, false)) {
+                    functions.add(fn);
+                }
+            }
+        }
+        return ChargeLogic.usbDataLabel(true, connected, functions);
     }
 
     private static String sourceLabel(int plugType) {

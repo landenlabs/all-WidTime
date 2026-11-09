@@ -54,4 +54,63 @@ public class ChargeLogicTest {
         assertNull(ChargeLogic.speedForWatts(Double.NaN));
         assertTrue(Double.isNaN(ChargeLogic.maxChargingWatts(-1, -1)));
     }
+
+    @Test
+    public void usbDataLabel() {
+        assertNull(ChargeLogic.usbDataLabel(false, true, java.util.Arrays.asList("adb")));
+        assertEquals("Power only · no data", ChargeLogic.usbDataLabel(true, false, null));
+        assertEquals("Power + data", ChargeLogic.usbDataLabel(true, true, java.util.Collections.emptyList()));
+        assertEquals("Power + data · ADB, MTP",
+                ChargeLogic.usbDataLabel(true, true, java.util.Arrays.asList("adb", "mtp")));
+    }
+
+    /** Feeds a charge's level readings through the rule; returns the announced levels. */
+    private static java.util.List<Integer> spoken(int step, int... levels) {
+        java.util.List<Integer> out = new java.util.ArrayList<>();
+        int mark = -1;
+        for (int level : levels) {
+            if (ChargeLogic.shouldSpeak(mark, level, step)) {
+                out.add(level);
+            }
+            mark = ChargeLogic.nextSpeakMark(mark, level, step);
+        }
+        return out;
+    }
+
+    @Test
+    public void speakCrossingStep() {
+        assertEquals(java.util.Arrays.asList(10), spoken(10, 9, 10));
+    }
+
+    @Test
+    public void speakBigJumpOnceAtActualLevel() {
+        assertEquals(java.util.Arrays.asList(22), spoken(10, 9, 22));
+    }
+
+    @Test
+    public void speakSameStepIsQuietThenNextStep() {
+        assertEquals(java.util.Arrays.asList(30), spoken(10, 22, 25, 29, 30));
+    }
+
+    @Test
+    public void speakFirstReadingOnlyArms() {
+        assertEquals(java.util.Arrays.asList(50), spoken(10, 47, 48, 49, 50));
+    }
+
+    @Test
+    public void speakDipDoesNotRepeat() {
+        assertEquals(java.util.Arrays.asList(50, 60), spoken(10, 49, 50, 49, 48, 50, 59, 60));
+    }
+
+    @Test
+    public void speakFullAndOtherSteps() {
+        assertEquals(java.util.Arrays.asList(100), spoken(10, 98, 99, 100));
+        assertEquals(java.util.Arrays.asList(25, 50), spoken(25, 24, 25, 49, 50));
+        assertEquals(java.util.Arrays.asList(5, 10), spoken(5, 4, 5, 9, 10));
+    }
+
+    @Test
+    public void speakOffNeverSpeaks() {
+        assertTrue(spoken(0, 9, 10, 50, 100).isEmpty());
+    }
 }

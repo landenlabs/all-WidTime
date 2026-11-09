@@ -8,6 +8,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -94,6 +95,7 @@ public class TimeWidgetProvider extends AppWidgetProvider {
         views.setOnClickPendingIntent(R.id.widget_empty_view, configPendingIntent);
         views.setPendingIntentTemplate(R.id.widget_list, configPendingIntent);
         views.setOnClickPendingIntent(R.id.alarm_panel, ChargeAlerts.alarmActivityIntent(context));
+        views.setOnClickPendingIntent(R.id.charging_bell, ChargeAlerts.toggleMuteIntent(context));
 
         appWidgetManager.updateAppWidget(widgetId, views);
         appWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.id.widget_list);
@@ -121,7 +123,7 @@ public class TimeWidgetProvider extends AppWidgetProvider {
 
     private static void applyDynamicState(Context context, RemoteViews views, int widgetId,
                                           BatteryStatus status, ChargingInfo charging, boolean alarm) {
-        applyBatteryBars(context, views, widgetId, status);
+        applyBatteryBars(context, views, widgetId, status, charging.plugged);
 
         boolean showCharging = !alarm && charging.plugged;
         views.setViewVisibility(R.id.alarm_panel, alarm ? View.VISIBLE : View.GONE);
@@ -140,6 +142,12 @@ public class TimeWidgetProvider extends AppWidgetProvider {
             views.setTextViewText(R.id.charging_detail, chargingDetail(charging));
             styleText(views, R.id.charging_headline, color, size);
             styleText(views, R.id.charging_detail, color, size * 0.8f);
+            views.setViewVisibility(R.id.charging_usb, charging.usbData != null ? View.VISIBLE : View.GONE);
+            if (charging.usbData != null) {
+                views.setTextViewText(R.id.charging_usb, charging.usbData);
+                styleText(views, R.id.charging_usb, color, size * 0.8f);
+            }
+            applyBell(context, views, color, size);
         }
         if (alarm) {
             views.setTextViewTextSize(R.id.alarm_headline, TypedValue.COMPLEX_UNIT_SP, size);
@@ -173,8 +181,32 @@ public class TimeWidgetProvider extends AppWidgetProvider {
         views.setTextViewTextSize(viewId, TypedValue.COMPLEX_UNIT_SP, sizeSp);
     }
 
-    private static void applyBatteryBars(Context context, RemoteViews views, int widgetId, BatteryStatus status) {
-        boolean showBattery = WidgetPrefs.getShowBatteryBar(context, widgetId) && status.levelPercent >= 0;
+    /** Bell on the charging panel's right edge: mutes pings, speech + unplug alarm for this charge only. */
+    private static void applyBell(Context context, RemoteViews views, int color, float textSizeSp) {
+        if (!ChargeAlerts.hasChargingSounds(context)) {
+            views.setViewVisibility(R.id.charging_bell, View.GONE);
+            return;
+        }
+        boolean muted = ChargeAlerts.isSessionMuted(context);
+        views.setViewVisibility(R.id.charging_bell, View.VISIBLE);
+        views.setImageViewResource(R.id.charging_bell, muted ? R.drawable.ic_bell_off : R.drawable.ic_bell);
+        views.setInt(R.id.charging_bell, "setColorFilter", color);
+        views.setInt(R.id.charging_bell, "setImageAlpha", muted ? 0x99 : 0xFF);
+        views.setContentDescription(R.id.charging_bell,
+                context.getString(muted ? R.string.bell_off_desc : R.string.bell_on_desc));
+        if (Build.VERSION.SDK_INT >= 31) {
+            // Scale with the text (two lines of it), but keep a usable touch target.
+            float sideSp = Math.max(textSizeSp * 2f, 24f);
+            views.setViewLayoutWidth(R.id.charging_bell, sideSp, TypedValue.COMPLEX_UNIT_SP);
+            views.setViewLayoutHeight(R.id.charging_bell, sideSp, TypedValue.COMPLEX_UNIT_SP);
+        }
+    }
+
+    /** The top (battery level) bar is always shown while charging, whatever the widget setting. */
+    private static void applyBatteryBars(Context context, RemoteViews views, int widgetId,
+                                         BatteryStatus status, boolean plugged) {
+        boolean showBattery = (plugged || WidgetPrefs.getShowBatteryBar(context, widgetId))
+                && status.levelPercent >= 0;
         views.setViewVisibility(R.id.battery_bar, showBattery ? View.VISIBLE : View.GONE);
         if (showBattery) {
             setBar(views, R.id.battery_bar, status.levelPercent);

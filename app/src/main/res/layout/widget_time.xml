@@ -40,26 +40,53 @@
                 android:textSize="12sp" />
         </FrameLayout>
 
+        <!-- Charging: left-justified text, bell (mute alarm for this charge) on the right edge. -->
         <LinearLayout
             android:id="@+id/charging_panel"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:visibility="gone">
 
-            <TextView
-                android:id="@+id/charging_headline"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:textStyle="bold" />
+                android:layout_weight="1"
+                android:gravity="start"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/charging_detail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:singleLine="true" />
+                <TextView
+                    android:id="@+id/charging_headline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/charging_detail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true" />
+
+                <!-- Wired only: whether the cable / host carries USB data. -->
+                <TextView
+                    android:id="@+id/charging_usb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/charging_bell"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="4dp"
+                android:contentDescription="@string/bell_on_desc"
+                android:padding="4dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_bell" />
         </LinearLayout>
 
         <LinearLayout

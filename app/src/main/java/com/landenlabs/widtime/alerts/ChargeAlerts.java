@@ -38,6 +38,7 @@ public final class ChargeAlerts {
     static final String ACTION_PING = "com.landenlabs.widtime.ACTION_CHARGE_PING";
     static final String ACTION_ALARM = "com.landenlabs.widtime.ACTION_UNPLUG_ALARM";
     static final String ACTION_STOP_ALARM = "com.landenlabs.widtime.ACTION_STOP_ALARM";
+    static final String ACTION_TOGGLE_MUTE = "com.landenlabs.widtime.ACTION_TOGGLE_MUTE";
 
     static final String CHANNEL_MONITOR = "charge_monitor";
     static final String CHANNEL_ALARM = "charger_alarm";
@@ -49,6 +50,15 @@ public final class ChargeAlerts {
     private static final String KEY_SESSION = "charging_session";
     private static final String KEY_PINGS = "pings_played";
     private static final String KEY_ALARM = "alarm_active";
+    /** Bell tapped off on the widget: no pings, speech or unplug alarm until this charge ends. */
+    private static final String KEY_MUTED = "session_muted";
+    /** "Speak battery %" step (5, 10, 20, 25), or 0 for off. App-wide, like KEY_ENABLED. */
+    private static final String KEY_SPEAK_STEP = "speak_step";
+    /** Highest level / step announced (or passed) this charge; -1 until the first reading. */
+    private static final String KEY_SPEAK_MARK = "speak_mark";
+    private static final String KEY_LAST_SPOKEN = "last_spoken_millis";
+    /** A ping this soon after an announcement is silent, so the two don't overlap. */
+    private static final long PING_AFTER_SPEECH_GAP_MILLIS = 60_000L;
 
     private ChargeAlerts() {
     }
@@ -66,18 +76,59 @@ public final class ChargeAlerts {
         syncService(context);
     }
 
+    public static int getSpeakStep(Context context) {
+        return prefs(context).getInt(KEY_SPEAK_STEP, 0);
+    }
+
+    /** 0 turns speech off. Re-arms the mark, so a change mid-charge starts from the current level. */
+    public static void setSpeakStep(Context context, int step) {
+        prefs(context).edit().putInt(KEY_SPEAK_STEP, Math.max(step, 0)).putInt(KEY_SPEAK_MARK, -1).apply();
+        syncService(context);
+    }
+
+    /** Pings, unplug alarm, or speech: whether the widget's charging bell has anything to mute. */
+    public static boolean hasChargingSounds(Context context) {
+        return isEnabled(context) || getSpeakStep(context) > 0;
+    }
+
     public static boolean isAlarmActive(Context context) {
         return prefs(context).getBoolean(KEY_ALARM, false);
     }
 
+    /** True if the user muted pings, speech and the unplug alarm for the current charging session. */
+    public static boolean isSessionMuted(Context context) {
+        return prefs(context).getBoolean(KEY_MUTED, false);
+    }
+
+    /** Widget bell tapped: flip the mute for this charging session only. */
+    static void toggleSessionMuted(Context context) {
+        prefs(context).edit().putBoolean(KEY_MUTED, !isSessionMuted(context)).apply();
+        TimeWidgetProvider.refreshAll(context);
+    }
+
+    public static PendingIntent toggleMuteIntent(Context context) {
+        Intent intent = new Intent(context, ChargeAlertReceiver.class).setAction(ACTION_TOGGLE_MUTE);
+        return PendingIntent.getBroadcast(context, 5, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+    }
+
     /**
-     * Runs the monitor service while alerts are enabled and at least one widget exists. Android 12+
-     * refuses foreground-service starts from the background; those callers (widget updates) are
-     * covered by starts from the settings screen, boot, and app update.
+     * Runs the monitor service while alerts or speech are on and at least one widget exists.
+     * Android 12+ refuses foreground-service starts from the background; those callers (widget
+     * updates) are covered by starts from the settings screen, boot, and app update.
      */
     public static void syncService(Context context) {
         Intent service = new Intent(context, ChargeMonitorService.class);
-        if (isEnabled(context) && hasWidgets(context)) {
+        boolean widgets = hasWidgets(context);
+        boolean alerts = isEnabled(context) && widgets;
+        if (!alerts) {
+            cancel(context, ACTION_PING);
+            prefs(context).edit().putBoolean(KEY_SESSION, false).apply();
+            if (isAlarmActive(context)) {
+                stopAlarm(context);
+            }
+        }
+        if (alerts || (widgets && getSpeakStep(context) > 0)) {
             try {
                 ContextCompat.startForegroundService(context, service);
             } catch (IllegalStateException ignored) {
@@ -85,15 +136,14 @@ public final class ChargeAlerts {
             }
         } else {
             context.stopService(service);
-            cancel(context, ACTION_PING);
-            prefs(context).edit().putBoolean(KEY_SESSION, false).apply();
-            stopAlarm(context);
+            prefs(context).edit().putBoolean(KEY_MUTED, false).putInt(KEY_SPEAK_MARK, -1).apply();
         }
     }
 
     /** Alarms and in-flight sessions don't survive a reboot. */
     public static void onBoot(Context context) {
-        prefs(context).edit().putBoolean(KEY_SESSION, false).putBoolean(KEY_ALARM, false).apply();
+        prefs(context).edit().putBoolean(KEY_SESSION, false).putBoolean(KEY_ALARM, false)
+                .putBoolean(KEY_MUTED, false).putInt(KEY_SPEAK_MARK, -1).apply();
     }
 
     /** Catch up on plug/unplug that happened while the monitor wasn't running. */
@@ -116,7 +166,7 @@ public final class ChargeAlerts {
         }
         SharedPreferences p = prefs(context);
         if (isEnabled(context) && !p.getBoolean(KEY_SESSION, false)) {
-            p.edit().putBoolean(KEY_SESSION, true).putInt(KEY_PINGS, 0).apply();
+            p.edit().putBoolean(KEY_SESSION, true).putInt(KEY_PINGS, 0).putBoolean(KEY_MUTED, false).apply();
             schedule(context, ACTION_PING, System.currentTimeMillis() + ChargeLogic.pingDelayMillis(0), false);
         }
         TimeWidgetProvider.refreshAll(context);
@@ -124,8 +174,10 @@ public final class ChargeAlerts {
 
     static void onPowerDisconnected(Context context) {
         cancel(context, ACTION_PING);
-        prefs(context).edit().putBoolean(KEY_SESSION, false).apply();
-        if (isEnabled(context)) {
+        boolean muted = isSessionMuted(context);
+        // The mute only covers the charge that just ended.
+        prefs(context).edit().putBoolean(KEY_SESSION, false).putBoolean(KEY_MUTED, false).apply();
+        if (isEnabled(context) && !muted) {
             prefs(context).edit().putBoolean(KEY_ALARM, true).apply();
             SoundPlayer.playAlarm(context);
             scheduleNextAlarm(context);
@@ -144,11 +196,42 @@ public final class ChargeAlerts {
             onPowerDisconnected(context);
             return;
         }
-        SoundPlayer.playPing(context);
+        long sinceSpeech = System.currentTimeMillis() - p.getLong(KEY_LAST_SPOKEN, 0);
+        if (!isSessionMuted(context) && sinceSpeech >= PING_AFTER_SPEECH_GAP_MILLIS) {
+            SoundPlayer.playPing(context); // Skipped pings keep their schedule, so unmuting resumes it.
+        }
         int played = p.getInt(KEY_PINGS, 0) + 1;
         p.edit().putInt(KEY_PINGS, played).apply();
         schedule(context, ACTION_PING, System.currentTimeMillis() + ChargeLogic.pingDelayMillis(played), false);
         TimeWidgetProvider.refreshAll(context);
+    }
+
+    /**
+     * Every battery level / plug change (from the monitor service). While charging, says
+     * "Charged to N percent" each time the level reaches a new step; see ChargeLogic.shouldSpeak.
+     */
+    static void onBatteryLevel(Context context, int levelPercent, boolean plugged) {
+        int step = getSpeakStep(context);
+        SharedPreferences p = prefs(context);
+        int mark = p.getInt(KEY_SPEAK_MARK, -1);
+        if (step <= 0 || !plugged) {
+            if (mark != -1) {
+                p.edit().putInt(KEY_SPEAK_MARK, -1).apply(); // Next charge starts fresh.
+            }
+            return;
+        }
+        boolean speak = ChargeLogic.shouldSpeak(mark, levelPercent, step);
+        int next = ChargeLogic.nextSpeakMark(mark, levelPercent, step);
+        if (next != mark) {
+            p.edit().putInt(KEY_SPEAK_MARK, next).apply();
+        }
+        // Muted steps still raise the mark, so unmuting doesn't announce a stale level.
+        if (speak && !isSessionMuted(context)) {
+            p.edit().putLong(KEY_LAST_SPOKEN, System.currentTimeMillis()).apply();
+            Speaker.speak(context, levelPercent >= 100
+                    ? context.getString(R.string.speak_full)
+                    : context.getString(R.string.speak_charged, levelPercent));
+        }
     }
 
     static void onAlarmDue(Context context) {

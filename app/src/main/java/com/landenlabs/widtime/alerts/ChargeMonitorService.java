@@ -15,12 +15,14 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.landenlabs.widtime.R;
+import com.landenlabs.widtime.util.ChargingInfo;
 import com.landenlabs.widtime.widget.TimeWidgetProvider;
 
 /**
  * Since Android 8, POWER_CONNECTED/DISCONNECTED are only delivered to receivers registered at
  * runtime, so this foreground service stays running to catch them instantly (and to refresh the
- * widget's charging panel when the level changes). It shows a minimal, silent notification.
+ * widget's charging panel and speak "Charged to N percent" when the level changes). It shows a
+ * minimal, silent notification.
  */
 public class ChargeMonitorService extends Service {
 
@@ -41,8 +43,14 @@ public class ChargeMonitorService extends Service {
                 if (level != lastLevel || plugged != lastPlugged) {
                     lastLevel = level;
                     lastPlugged = plugged;
+                    int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
+                    int percent = level >= 0 && scale > 0 ? Math.round(level * 100f / scale) : -1;
+                    ChargeAlerts.onBatteryLevel(context, percent, plugged != 0);
                     TimeWidgetProvider.refreshAll(context);
                 }
+            } else if (ChargingInfo.ACTION_USB_STATE.equals(action)) {
+                // Host enumeration lands a moment after plug-in; also fires on USB mode changes.
+                TimeWidgetProvider.refreshAll(context);
             }
         }
     };
@@ -54,6 +62,7 @@ public class ChargeMonitorService extends Service {
         filter.addAction(Intent.ACTION_POWER_CONNECTED);
         filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
         filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        filter.addAction(ChargingInfo.ACTION_USB_STATE);
         // System broadcasts are still delivered to non-exported receivers.
         ContextCompat.registerReceiver(this, receiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
     }
@@ -75,6 +84,7 @@ public class ChargeMonitorService extends Service {
     @Override
     public void onDestroy() {
         unregisterReceiver(receiver);
+        Speaker.shutdown();
         super.onDestroy();
     }
 

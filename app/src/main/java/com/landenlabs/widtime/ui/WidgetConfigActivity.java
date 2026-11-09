@@ -16,9 +16,12 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.landenlabs.widtime.R;
 import com.landenlabs.widtime.alerts.ChargeAlerts;
 import com.landenlabs.widtime.model.CityEntry;
+import com.landenlabs.widtime.util.ChargeLogic;
 import com.landenlabs.widtime.util.ListMoves;
 import com.landenlabs.widtime.util.WidgetPrefs;
 import com.landenlabs.widtime.widget.TimeWidgetProvider;
@@ -70,6 +74,7 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
     private CheckBox showBatteryBar;
     private CheckBox showTimeLeftBar;
     private CheckBox chargeAlerts;
+    private Spinner speakStep;
     private View exactAlarmRow;
     private View undoButton;
 
@@ -81,6 +86,7 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
     // Undo: the widget's stored values and the app-wide alert switch as they were on open.
     private Map<String, ?> openedPrefs;
     private boolean openedChargeAlerts;
+    private int openedSpeakStep;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable timeTick = new Runnable() {
@@ -136,6 +142,7 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
 
         openedPrefs = WidgetPrefs.snapshot(this, widgetId);
         openedChargeAlerts = ChargeAlerts.isEnabled(this);
+        openedSpeakStep = ChargeAlerts.getSpeakStep(this);
 
         CollapsibleSection.bind(this, R.id.cities_header, R.id.cities_body, R.id.cities_chevron, "cities", true);
         CollapsibleSection.bind(this, R.id.background_header, R.id.background_body, R.id.background_chevron, "background", true);
@@ -382,6 +389,45 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
             saved();
         });
         findViewById(R.id.exact_alarm_button).setOnClickListener(v -> requestExactAlarms());
+        setUpSpeakStep();
+    }
+
+    /** "Speak battery %": Off / Every 5% / 10% / 20% / 25% (ChargeLogic.SPEAK_STEPS). */
+    private void setUpSpeakStep() {
+        speakStep = findViewById(R.id.speak_step);
+        String[] labels = new String[ChargeLogic.SPEAK_STEPS.length];
+        for (int i = 0; i < labels.length; i++) {
+            int step = ChargeLogic.SPEAK_STEPS[i];
+            labels[i] = step == 0 ? getString(R.string.speak_off) : getString(R.string.speak_step, step);
+        }
+        ArrayAdapter<String> stepAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, labels);
+        stepAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        speakStep.setAdapter(stepAdapter);
+        speakStep.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int step = ChargeLogic.SPEAK_STEPS[position];
+                if (binding || step == ChargeAlerts.getSpeakStep(WidgetConfigActivity.this)) {
+                    return; // Also swallows the spinner's initial selection callback.
+                }
+                // Started from this foreground screen, which Android 12+ requires for foreground services.
+                ChargeAlerts.setSpeakStep(WidgetConfigActivity.this, step);
+                saved();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
+    private static int speakStepIndex(int step) {
+        for (int i = 0; i < ChargeLogic.SPEAK_STEPS.length; i++) {
+            if (ChargeLogic.SPEAK_STEPS[i] == step) {
+                return i;
+            }
+        }
+        return 0;
     }
 
     private void updateExactAlarmRow() {
@@ -434,6 +480,7 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
             showBatteryBar.setChecked(WidgetPrefs.getShowBatteryBar(this, widgetId));
             showTimeLeftBar.setChecked(WidgetPrefs.getShowTimeLeftBar(this, widgetId));
             chargeAlerts.setChecked(ChargeAlerts.isEnabled(this));
+            speakStep.setSelection(speakStepIndex(ChargeAlerts.getSpeakStep(this)), false);
             updateExactAlarmRow();
         } finally {
             binding = false;
@@ -444,6 +491,9 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
         WidgetPrefs.restore(this, widgetId, openedPrefs);
         if (ChargeAlerts.isEnabled(this) != openedChargeAlerts) {
             ChargeAlerts.setEnabled(this, openedChargeAlerts);
+        }
+        if (ChargeAlerts.getSpeakStep(this) != openedSpeakStep) {
+            ChargeAlerts.setSpeakStep(this, openedSpeakStep);
         }
         bindCurrentValues();
         TimeWidgetProvider.updateAppWidget(this, AppWidgetManager.getInstance(this), widgetId);
