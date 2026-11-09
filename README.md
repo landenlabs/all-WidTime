@@ -80,10 +80,12 @@ sounds if the charger is unplugged.
 ### Requirements
 
 - Android 8.0 (API 26) or newer.
-- No internet access is needed. The city list is built in.
+- Internet is used only by the Add city search, which looks up cities, coordinates and time zones
+  with the free [Open-Meteo geocoding API](https://open-meteo.com/en/docs/geocoding-api)
+  (GeoNames data, CC BY 4.0). Offline, a built-in list of major cities is used.
 - Permissions: notifications, exact alarms (Alarms & reminders), foreground service, full-screen
   alarm, wake lock and start at boot, all used only by the charging pings and the unplug alarm.
-- No data leaves the device. See the [privacy policy](https://landenlabs.github.io/all-WidTime/privacy-policy.html).
+- Only the typed city name is sent, to Open-Meteo. See the [privacy policy](https://landenlabs.github.io/all-WidTime/privacy-policy.html).
 
 ### Setup
 

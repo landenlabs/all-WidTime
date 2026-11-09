@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/charging_header"
+        style="@style/SectionHeaderStyle">
+
+        <TextView
+            style="@style/SectionTitleStyle"
+            android:text="@string/section_charging" />
+
+        <ImageView
+            android:id="@+id/charging_chevron"
+            style="@style/SectionChevronStyle"
+            android:contentDescription="@null" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/charging_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <CheckBox
+            android:id="@+id/charge_alerts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/charge_alerts_label" />
+
+        <TextView
+            style="@style/HelpTextStyle"
+            android:text="@string/charge_alerts_help" />
+
+        <!-- Shown only while charging alerts are on and exact alarms are not allowed. -->
+        <LinearLayout
+            android:id="@+id/exact_alarm_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/exact_alarm_off"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/exact_alarm_button"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/exact_alarm_allow" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -14,12 +14,14 @@ import android.widget.RemoteViews;
 
 import com.landenlabs.widtime.R;
 import com.landenlabs.widtime.alerts.ChargeAlerts;
+import com.landenlabs.widtime.model.CityEntry;
 import com.landenlabs.widtime.ui.WidgetConfigActivity;
 import com.landenlabs.widtime.util.BatteryStatus;
 import com.landenlabs.widtime.util.ChargingInfo;
 import com.landenlabs.widtime.util.DischargeEstimator;
 import com.landenlabs.widtime.util.WidgetPrefs;
 
+import java.util.List;
 import java.util.Locale;
 
 public class TimeWidgetProvider extends AppWidgetProvider {
@@ -126,8 +128,11 @@ public class TimeWidgetProvider extends AppWidgetProvider {
         views.setViewVisibility(R.id.charging_panel, showCharging ? View.VISIBLE : View.GONE);
         views.setViewVisibility(R.id.city_area, alarm || showCharging ? View.GONE : View.VISIBLE);
 
-        int color = WidgetPrefs.getTextColor(context, widgetId);
-        float size = WidgetPrefs.getTextSize(context, widgetId);
+        // The charging and alarm panels take the first visible city's style.
+        List<CityEntry> visible = WidgetPrefs.getVisibleCities(context, widgetId);
+        CityEntry style = visible.isEmpty() ? WidgetPrefs.defaultStyle(context, widgetId) : visible.get(0);
+        int color = style.textColor;
+        float size = style.textSizeSp;
         if (showCharging) {
             views.setTextViewText(R.id.charging_headline, context.getString(
                     charging.full ? R.string.charged_headline : R.string.charging_headline,

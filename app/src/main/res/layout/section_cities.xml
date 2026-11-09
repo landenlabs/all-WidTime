@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cities: per-city styled list with selection, reorder and show/hide. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/cities_header"
+        style="@style/SectionHeaderStyle">
+
+        <TextView
+            style="@style/SectionTitleStyle"
+            android:text="@string/section_cities" />
+
+        <ImageView
+            android:id="@+id/cities_chevron"
+            style="@style/SectionChevronStyle"
+            android:contentDescription="@null" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/cities_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Shown while one or more cities are checked. -->
+        <LinearLayout
+            android:id="@+id/selection_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorSurfaceContainerHigh"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <CheckBox
+                android:id="@+id/select_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/select_all" />
+
+            <TextView
+                android:id="@+id/selected_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/edit_selected"
+                style="@style/IconButtonStyle"
+                android:contentDescription="@string/edit_selected"
+                android:src="@drawable/ic_edit" />
+
+            <ImageButton
+                android:id="@+id/move_up"
+                style="@style/IconButtonStyle"
+                android:contentDescription="@string/move_up"
+                android:src="@drawable/ic_arrow_up" />
+
+            <ImageButton
+                android:id="@+id/move_down"
+                style="@style/IconButtonStyle"
+                android:contentDescription="@string/move_down"
+                android:src="@drawable/ic_arrow_down" />
+
+            <ImageButton
+                android:id="@+id/delete_selected"
+                style="@style/IconButtonStyle"
+                android:contentDescription="@string/delete_selected"
+                android:src="@drawable/ic_delete" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/city_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false" />
+
+        <TextView
+            android:id="@+id/no_cities_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/no_cities_added"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/add_city_button"
+            style="@style/Widget.Material3.Button.TonalButton.Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/add_city"
+            app:icon="@drawable/ic_add" />
+
+        <TextView
+            style="@style/HelpTextStyle"
+            android:text="@string/city_list_help" />
+    </LinearLayout>
+</LinearLayout>

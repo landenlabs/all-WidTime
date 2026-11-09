@@ -1,38 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- One city in the settings list (narrow screens): the preview takes two lines - name and UTC
+     offset, then the time. layout-w600dp has a one-line version. The preview tile is drawn on the
+     widget's background color in that city's own text color, size and format. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:minHeight="56dp"
     android:orientation="horizontal"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp"
-    android:gravity="center_vertical">
+    android:paddingTop="2dp"
+    android:paddingBottom="2dp">
+
+    <CheckBox
+        android:id="@+id/entry_check"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:id="@+id/entry_drag"
+        android:layout_width="32dp"
+        android:layout_height="48dp"
+        android:contentDescription="@string/drag_to_reorder"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:src="@drawable/ic_drag_handle" />
 
     <LinearLayout
+        android:id="@+id/entry_preview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:orientation="vertical"
+        android:paddingStart="10dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="6dp">
 
-        <EditText
-            android:id="@+id/entry_label"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            android:singleLine="true"
-            android:textStyle="bold" />
+            android:baselineAligned="true"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/entry_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/entry_offset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:singleLine="true"
+                android:textSize="12sp" />
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/entry_zone"
+            android:id="@+id/entry_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:textColor="?android:attr/textColorSecondary" />
+            android:singleLine="true" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/entry_remove_button"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/remove" />
+    <ImageButton
+        android:id="@+id/entry_visible"
+        style="@style/IconButtonStyle"
+        android:contentDescription="@string/show_on_widget"
+        android:src="@drawable/ic_visibility" />
 </LinearLayout>

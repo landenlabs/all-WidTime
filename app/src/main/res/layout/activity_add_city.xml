@@ -18,7 +18,16 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:hint="@string/search_city_hint"
-        android:inputType="text" />
+        android:inputType="textPostalAddress" />
+
+    <!-- "Searching…" / "Offline: showing built-in cities" -->
+    <TextView
+        android:id="@+id/search_status_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textAppearance="?attr/textAppearanceBodySmall"
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/city_results_recycler_view"
@@ -33,6 +42,14 @@
         android:layout_height="wrap_content"
         android:text="@string/no_matches"
         android:visibility="gone" />
+
+    <!-- Attribution required by the Open-Meteo and GeoNames (CC BY 4.0) terms. -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/city_search_attribution"
+        android:textAppearance="?attr/textAppearanceBodySmall" />
 
     <Button
         android:id="@+id/manual_entry_toggle_button"

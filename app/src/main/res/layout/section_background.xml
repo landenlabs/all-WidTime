@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/background_header"
+        style="@style/SectionHeaderStyle">
+
+        <TextView
+            style="@style/SectionTitleStyle"
+            android:text="@string/section_background" />
+
+        <ImageView
+            android:id="@+id/background_chevron"
+            style="@style/SectionChevronStyle"
+            android:contentDescription="@null" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/background_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bg_color_label" />
+
+        <!-- Color swatches are added in code (ColorSwatches). -->
+        <LinearLayout
+            android:id="@+id/bg_swatches"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal" />
+
+        <EditText
+            android:id="@+id/bg_hex_color_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:autofillHints=""
+            android:hint="@string/hex_hint"
+            android:inputType="text"
+            android:maxLength="7" />
+
+        <TextView
+            android:id="@+id/bg_alpha_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp" />
+
+        <SeekBar
+            android:id="@+id/bg_alpha_slider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/bg_alpha_label"
+            android:max="255" />
+    </LinearLayout>
+</LinearLayout>

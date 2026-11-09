@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/battery_header"
+        style="@style/SectionHeaderStyle">
+
+        <TextView
+            style="@style/SectionTitleStyle"
+            android:text="@string/section_battery" />
+
+        <ImageView
+            android:id="@+id/battery_chevron"
+            style="@style/SectionChevronStyle"
+            android:contentDescription="@null" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/battery_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <CheckBox
+            android:id="@+id/show_battery_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/battery_bar_label" />
+
+        <CheckBox
+            android:id="@+id/show_time_left_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/time_left_bar_label" />
+
+        <TextView
+            style="@style/HelpTextStyle"
+            android:text="@string/battery_bar_help" />
+    </LinearLayout>
+</LinearLayout>

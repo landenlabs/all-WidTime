@@ -1,24 +1,20 @@
 <resources>
     <string name="app_name">all World Time</string>
     <string name="widget_description">Shows the current date and time for cities you choose from around the world.</string>
-    <string name="widget_empty">Tap to add cities</string>
+    <string name="widget_empty">Tap to add or show cities</string>
     <string name="format_error">Invalid format</string>
     <string name="invalid_pattern">Invalid pattern</string>
 
-    <string name="config_title">Configure WidTime</string>
+    <!-- Shown after the gear icon; %1$s is the version name, e.g. "WidTime 1.0". -->
+    <string name="config_title">WidTime %1$s</string>
     <string name="add_city">Add city</string>
-    <string name="save">Save</string>
-    <string name="remove">Remove</string>
     <string name="section_cities">Cities</string>
-    <string name="section_appearance">Appearance</string>
-    <string name="preview_label">Preview</string>
     <string name="text_color_label">Text color</string>
     <string name="text_size_label">Text size</string>
     <string name="date_format_label">Date/time format (DateTimeFormatter pattern)</string>
     <string name="date_format_hint">e.g. EEE d MMM, HH:mm</string>
     <string name="format_help">Pattern letters follow java.time.format.DateTimeFormatter: yyyy=year, MM=month, dd=day, EEE=weekday, HH=24h hour, hh=12h hour, mm=minute. For am/pm: lowercase \'a\' forces lowercase (am/pm), uppercase \'A\' forces uppercase (AM/PM).</string>
     <string name="no_cities_added">No cities added yet. Tap \"Add city\" to get started.</string>
-    <string name="preview_sample_city">New York</string>
     <string name="section_background">Background</string>
     <string name="bg_color_label">Background color</string>
     <string name="bg_alpha_label">Background opacity</string>
@@ -44,7 +40,10 @@
     <string name="charged_headline">⚡ %1$d%% · Fully charged</string>
 
     <string name="search_city_title">Add a city</string>
-    <string name="search_city_hint">Search city or country</string>
+    <string name="search_city_hint">City, e.g. Boston or Salem, NH</string>
+    <string name="city_searching">Searching…</string>
+    <string name="city_search_offline">Can\'t reach the city search. Showing built-in cities.</string>
+    <string name="city_search_attribution" translatable="false">City search by Open-Meteo.com, data from GeoNames.org (CC BY 4.0)</string>
     <string name="manual_entry_toggle">Can\'t find your city? Enter it manually</string>
     <string name="manual_city_label_hint">City or place name</string>
     <string name="manual_offset_hint">UTC offset, e.g. +05:30, -08:00, Z</string>
@@ -53,4 +52,58 @@
     <string name="exact_alarm_off">Exact alarms are off, so pings and the unplug alarm can be several minutes late.</string>
     <string name="exact_alarm_allow">Allow exact alarms</string>
     <string name="no_matches">No matching cities. Try manual entry below.</string>
+
+    <!-- Settings screen: city list -->
+    <string name="city_list_help">Tap a city to change its name, color, size or format. Check cities to change several at once. Drag the ═ handle to reorder.</string>
+    <string name="selected_count">%1$d selected</string>
+    <string name="select_all">Select all</string>
+    <string name="edit_selected">Edit selected cities</string>
+    <string name="move_up">Move up</string>
+    <string name="move_down">Move down</string>
+    <string name="delete_selected">Delete selected cities</string>
+    <string name="drag_to_reorder">Drag to reorder</string>
+    <string name="select_city">Select %1$s</string>
+    <string name="show_on_widget">Shown on widget. Tap to hide.</string>
+    <string name="hidden_on_widget">Hidden on widget. Tap to show.</string>
+    <plurals name="cities_deleted">
+        <item quantity="one">Deleted %1$d city. Undo brings back everything you changed.</item>
+        <item quantity="other">Deleted %1$d cities. Undo brings back everything you changed.</item>
+    </plurals>
+
+    <!-- Settings screen: city edit sheet -->
+    <string name="edit_city_title">Edit %1$s</string>
+    <string name="edit_cities_title">Edit %1$d cities</string>
+    <string name="city_name_label">Name</string>
+    <string name="mixed">Mixed</string>
+    <string name="text_size_value">Text size: %1$d sp</string>
+    <string name="text_size_mixed">Text size: mixed</string>
+    <string name="done">Done</string>
+    <string name="delete">Delete</string>
+
+    <!-- Settings screen: background, bottom bar, privacy -->
+    <string name="bg_alpha_value">Background opacity: %1$d</string>
+    <string name="hex_hint" translatable="false">#RRGGBB</string>
+    <string name="expanded">Expanded</string>
+    <string name="collapsed">Collapsed</string>
+    <string name="color_white">White</string>
+    <string name="color_black">Black</string>
+    <string name="color_yellow">Yellow</string>
+    <string name="color_red">Red</string>
+    <string name="color_cyan">Cyan</string>
+    <string name="color_green">Green</string>
+    <string name="undo">Undo</string>
+    <string name="undo_help">Changes are saved as you make them. Undo restores the settings you had when you opened this screen.</string>
+    <string name="undo_done">Settings restored</string>
+    <string name="privacy">Privacy</string>
+    <string name="privacy_title">Privacy policy</string>
+    <string name="privacy_open_web">Open web page</string>
+    <string name="privacy_url" translatable="false">https://landenlabs.github.io/all-WidTime/privacy-policy.html</string>
+    <string name="privacy_text"><![CDATA[
+<p>All World Time is published by LanDen Labs. It has no account, shows no ads and does not sell or share data.</p>
+<p><b>City search is the only network use.</b> When you type in Add city, the city name you type (the part before any comma) is sent to the free Open-Meteo geocoding service (open-meteo.com) to find matching cities and their time zones. Like any web request, Open-Meteo sees your IP address. Nothing else is sent: no location, settings, battery data or identifiers. The app contains no analytics, crash reporting or advertising code, and we never receive any of your data.</p>
+<p><b>Stored only on your phone:</b> the cities, colors, sizes and formats you choose for each widget; recent battery readings used to estimate the time left; and whether charging alerts are on. Android backup, if you turn it on, may back these settings up to your Google account.</p>
+<p><b>Permissions:</b> Internet (city search only), notifications (the unplug alarm and the “Watching charger” notice), a foreground service (to notice the charger being connected or unplugged), exact alarms (to play pings and the alarm on time), full-screen alarm, wake lock (while a sound plays) and run at startup. The app does not use location, camera, microphone, contacts, photos or storage.</p>
+<p><b>Deleting data:</b> removing a widget deletes its settings. Uninstalling the app or clearing its storage deletes everything.</p>
+<p>Questions: landenlabs.app@gmail.com</p>
+]]></string>
 </resources>

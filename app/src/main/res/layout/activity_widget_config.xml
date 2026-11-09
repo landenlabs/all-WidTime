@@ -1,380 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Narrow screens (phones): one scrolling column. See layout-w600dp for the two-column version. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:orientation="vertical">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/config_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        app:drawableStartCompat="@drawable/ic_settings"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="4dp"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/config_title"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/section_cities"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/city_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
-
-        <TextView
-            android:id="@+id/no_cities_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/no_cities_added"
-            android:visibility="gone" />
-
-        <Button
-            android:id="@+id/add_city_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/add_city" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:background="?attr/colorOutlineVariant" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/section_appearance"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/text_color_label" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="16dp">
 
-            <ImageButton
-                android:id="@+id/swatch_white"
-                style="@style/ColorSwatchStyle"
-                android:backgroundTint="@color/swatch_white"
-                android:contentDescription="@string/text_color_label" />
+            <include layout="@layout/section_cities" />
 
-            <ImageButton
-                android:id="@+id/swatch_black"
-                style="@style/ColorSwatchStyle"
-                android:backgroundTint="@color/swatch_black"
-                android:contentDescription="@string/text_color_label" />
+            <View style="@style/SectionDividerStyle" />
 
-            <ImageButton
-                android:id="@+id/swatch_yellow"
-                style="@style/ColorSwatchStyle"
-                android:backgroundTint="@color/swatch_yellow"
-                android:contentDescription="@string/text_color_label" />
+            <include layout="@layout/section_background" />
 
-            <ImageButton
-                android:id="@+id/swatch_red"
-                style="@style/ColorSwatchStyle"
-                android:backgroundTint="@color/swatch_red"
-                android:contentDescription="@string/text_color_label" />
+            <View style="@style/SectionDividerStyle" />
 
-            <ImageButton
-                android:id="@+id/swatch_cyan"
-                style="@style/ColorSwatchStyle"
-                android:backgroundTint="@color/swatch_cyan"
-                android:contentDescription="@string/text_color_label" />
+            <include layout="@layout/section_battery" />
 
-            <ImageButton
-                android:id="@+id/swatch_green"
-                style="@style/ColorSwatchStyle"
-                android:backgroundTint="@color/swatch_green"
-                android:contentDescription="@string/text_color_label" />
+            <View style="@style/SectionDividerStyle" />
+
+            <include layout="@layout/section_charging" />
         </LinearLayout>
+    </ScrollView>
 
-        <EditText
-            android:id="@+id/hex_color_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="#RRGGBB"
-            android:inputType="text"
-            android:maxLength="7" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/text_size_label" />
-
-        <SeekBar
-            android:id="@+id/text_size_slider"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="32" />
-
-        <TextView
-            android:id="@+id/text_size_value"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/date_format_label" />
-
-        <EditText
-            android:id="@+id/pattern_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/date_format_hint"
-            android:inputType="text" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/format_help"
-            android:textSize="11sp"
-            android:textColor="?android:attr/textColorSecondary" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/preview_label"
-            android:textSize="12sp"
-            android:textColor="?android:attr/textColorSecondary" />
-
-        <LinearLayout
-            android:id="@+id/preview_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:orientation="vertical">
-
-            <ImageView
-                android:id="@+id/preview_battery_bar"
-                style="@style/BatteryBarStyle"
-                android:contentDescription="@string/battery_bar_label" />
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="4dp">
-
-                <include layout="@layout/widget_time_item" />
-            </FrameLayout>
-
-            <ImageView
-                android:id="@+id/preview_time_left_bar"
-                style="@style/BatteryBarStyle"
-                android:contentDescription="@string/time_left_bar_label" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:background="?attr/colorOutlineVariant" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/section_background"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/bg_color_label" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:orientation="horizontal">
-
-            <ImageButton
-                android:id="@+id/bg_swatch_white"
-                style="@style/ColorSwatchStyle"
-                android:backgroundTint="@color/swatch_white"
-                android:contentDescription="@string/bg_color_label" />
-
-            <ImageButton
-                android:id="@+id/bg_swatch_black"
-                style="@style/ColorSwatchStyle"
-                android:backgroundTint="@color/swatch_black"
-                android:contentDescription="@string/bg_color_label" />
-
-            <ImageButton
-                android:id="@+id/bg_swatch_yellow"
-                style="@style/ColorSwatchStyle"
-                android:backgroundTint="@color/swatch_yellow"
-                android:contentDescription="@string/bg_color_label" />
-
-            <ImageButton
-                android:id="@+id/bg_swatch_red"
-                style="@style/ColorSwatchStyle"
-                android:backgroundTint="@color/swatch_red"
-                android:contentDescription="@string/bg_color_label" />
-
-            <ImageButton
-                android:id="@+id/bg_swatch_cyan"
-                style="@style/ColorSwatchStyle"
-                android:backgroundTint="@color/swatch_cyan"
-                android:contentDescription="@string/bg_color_label" />
-
-            <ImageButton
-                android:id="@+id/bg_swatch_green"
-                style="@style/ColorSwatchStyle"
-                android:backgroundTint="@color/swatch_green"
-                android:contentDescription="@string/bg_color_label" />
-        </LinearLayout>
-
-        <EditText
-            android:id="@+id/bg_hex_color_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="#RRGGBB"
-            android:inputType="text"
-            android:maxLength="7" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/bg_alpha_label" />
-
-        <SeekBar
-            android:id="@+id/bg_alpha_slider"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="255" />
-
-        <TextView
-            android:id="@+id/bg_alpha_value"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:background="?attr/colorOutlineVariant" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/section_battery"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <CheckBox
-            android:id="@+id/show_battery_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/battery_bar_label" />
-
-        <CheckBox
-            android:id="@+id/show_time_left_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/time_left_bar_label" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/battery_bar_help"
-            android:textSize="11sp"
-            android:textColor="?android:attr/textColorSecondary" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:background="?attr/colorOutlineVariant" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/section_charging"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <CheckBox
-            android:id="@+id/charge_alerts"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/charge_alerts_label" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/charge_alerts_help"
-            android:textSize="11sp"
-            android:textColor="?android:attr/textColorSecondary" />
-
-        <!-- Shown only while charging alerts are on and exact alarms are not allowed. -->
-        <LinearLayout
-            android:id="@+id/exact_alarm_row"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/exact_alarm_off"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/exact_alarm_button"
-                style="@style/Widget.Material3.Button.TonalButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="@string/exact_alarm_allow" />
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/save_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/save" />
-
-    </LinearLayout>
-</ScrollView>
+    <include layout="@layout/include_bottom_bar" />
+</LinearLayout>
