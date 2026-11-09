@@ -3,35 +3,37 @@ plugins {
 }
 
 android {
-    namespace 'com.dennislang.widtime'
-    compileSdk 34
+    namespace = 'com.landenlabs.widtime'
+    compileSdk = 37
 
     defaultConfig {
-        applicationId "com.dennislang.widtime"
-        minSdk 26
-        targetSdk 34
-        versionCode 1
-        versionName "1.0"
+        applicationId = "com.landenlabs.widtime"
+        minSdk = 26
+        targetSdk = 37
+        versionCode = 1
+        versionName = "1.0"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            // R8 shrink + obfuscate + optimize. Manifest components (activities, receivers,
+            // services) are kept automatically by AAPT-generated rules; anything reflective
+            // needs a keep rule in proguard-rules.pro.
+            minifyEnabled = true
+            shrinkResources = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
-    // APK named with the app version, e.g. WidTime-1.0-debug.apk
-    applicationVariants.all { variant ->
-        variant.outputs.all {
-            outputFileName = "WidTime-${variant.versionName}-${variant.buildType.name}.apk"
-        }
-    }
-
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
+}
+
+// Output named with the app version, e.g. WidTime-1.0-debug.apk / WidTime-1.0-release.aab
+base {
+    archivesName = "WidTime-${android.defaultConfig.versionName}"
 }
 
 dependencies {

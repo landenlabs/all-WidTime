@@ -81,15 +81,19 @@ sounds if the charger is unplugged.
 
 - Android 8.0 (API 26) or newer.
 - No internet access is needed. The city list is built in.
-- Permissions: notifications, exact alarms, foreground service, wake lock and start at boot,
-  all used only by the charging pings and the unplug alarm.
+- Permissions: notifications, exact alarms (Alarms & reminders), foreground service, full-screen
+  alarm, wake lock and start at boot, all used only by the charging pings and the unplug alarm.
+- No data leaves the device. See the [privacy policy](https://landenlabs.github.io/all-WidTime/privacy-policy.html).
 
 ### Setup
 
 1. Long-press the home screen, choose **Widgets**, and add **all World Time**.
 2. The configuration screen opens. Tap **Add city** to add cities.
 3. Under **Appearance**, **Background**, **Battery** and **Charging**, choose the options you want.
-4. Tap **Save**. To change the settings later, tap the widget.
+4. On Android 14 and newer, exact alarms are off by default. If **Charging** shows "Exact alarms
+   are off", tap **Allow exact alarms** so the pings and unplug alarm play on time. Without it
+   they still work but can be several minutes late.
+5. Tap **Save**. To change the settings later, tap the widget.
 
 ### Building
 
@@ -97,8 +101,14 @@ sounds if the charger is unplugged.
 ./gradlew assembleDebug
 ```
 
-The APK is named after the version, for example `WidTime-1.0-debug.apk`. Unit tests for the
-charging and battery estimate logic run with:
+Outputs are named after the version, for example `WidTime-1.0-debug.apk`. The Play Store bundle
+(R8 shrinks and obfuscates release builds) is built with:
+
+```
+./gradlew bundleRelease
+```
+
+Unit tests for the charging and battery estimate logic run with:
 
 ```
 ./gradlew test

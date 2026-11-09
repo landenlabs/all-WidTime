@@ -7,12 +7,11 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
-    <!-- Exact timing for pings and the unplug alarm: SCHEDULE_EXACT_ALARM on 12L and lower,
-         USE_EXACT_ALARM (auto-granted, intended for alarm apps) on 13+. -->
-    <uses-permission
-        android:name="android.permission.SCHEDULE_EXACT_ALARM"
-        android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <!-- Exact timing for pings and the unplug alarm. Not USE_EXACT_ALARM: Google Play allows that
+         only for apps whose core function is an alarm clock or calendar. On Android 14+ this is
+         off by default; the Charging settings offer "Allow exact alarms", and until it is granted
+         ChargeAlerts falls back to inexact alarms. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <application
         android:allowBackup="true"

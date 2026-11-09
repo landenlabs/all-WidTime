@@ -10,3 +10,6 @@ captures/
 *.apk
 *.ap_
 *.aab
+
+# Private notes/scripts (Play Store video, etc.) - never in this public repo
+private/

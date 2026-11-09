@@ -50,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="16dp"
-            android:background="#33000000" />
+            android:background="?attr/colorOutlineVariant" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -154,7 +154,7 @@
             android:layout_marginTop="4dp"
             android:text="@string/format_help"
             android:textSize="11sp"
-            android:textColor="#88000000" />
+            android:textColor="?android:attr/textColorSecondary" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -162,7 +162,7 @@
             android:layout_marginTop="16dp"
             android:text="@string/preview_label"
             android:textSize="12sp"
-            android:textColor="#88000000" />
+            android:textColor="?android:attr/textColorSecondary" />
 
         <LinearLayout
             android:id="@+id/preview_container"
@@ -194,7 +194,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="16dp"
-            android:background="#33000000" />
+            android:background="?attr/colorOutlineVariant" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -283,7 +283,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="16dp"
-            android:background="#33000000" />
+            android:background="?attr/colorOutlineVariant" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -312,13 +312,13 @@
             android:layout_marginTop="4dp"
             android:text="@string/battery_bar_help"
             android:textSize="11sp"
-            android:textColor="#88000000" />
+            android:textColor="?android:attr/textColorSecondary" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="16dp"
-            android:background="#33000000" />
+            android:background="?attr/colorOutlineVariant" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -341,7 +341,33 @@
             android:layout_marginTop="4dp"
             android:text="@string/charge_alerts_help"
             android:textSize="11sp"
-            android:textColor="#88000000" />
+            android:textColor="?android:attr/textColorSecondary" />
+
+        <!-- Shown only while charging alerts are on and exact alarms are not allowed. -->
+        <LinearLayout
+            android:id="@+id/exact_alarm_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/exact_alarm_off"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/exact_alarm_button"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/exact_alarm_allow" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/save_button"

@@ -50,5 +50,7 @@
     <string name="manual_offset_hint">UTC offset, e.g. +05:30, -08:00, Z</string>
     <string name="use_manual_entry">Use this location</string>
     <string name="invalid_offset">Enter a valid UTC offset, e.g. +05:30 or Z</string>
+    <string name="exact_alarm_off">Exact alarms are off, so pings and the unplug alarm can be several minutes late.</string>
+    <string name="exact_alarm_allow">Allow exact alarms</string>
     <string name="no_matches">No matching cities. Try manual entry below.</string>
 </resources>
