@@ -17,7 +17,7 @@ import java.util.Set;
 
 /**
  * Per-widget-instance settings storage: the cities shown (each with its own text color, size,
- * date/time format and visibility), background, and battery bars.
+ * date/time format and visibility), background, battery bars, and charging alert / speech choices.
  */
 public final class WidgetPrefs {
 
@@ -26,6 +26,8 @@ public final class WidgetPrefs {
     private static final String KEY_BACKGROUND_COLOR = "background_color";
     private static final String KEY_SHOW_BATTERY_BAR = "show_battery_bar";
     private static final String KEY_SHOW_TIME_LEFT_BAR = "show_time_left_bar";
+    private static final String KEY_CHARGE_ALERTS = "charge_alerts";
+    private static final String KEY_SPEAK_STEP = "speak_step";
 
     // Before per-city styles, one color/size/format applied to the whole widget. These keys are
     // only read now, as the style for cities saved without one.
@@ -132,6 +134,27 @@ public final class WidgetPrefs {
 
     public static void setShowTimeLeftBar(Context context, int widgetId, boolean show) {
         prefs(context, widgetId).edit().putBoolean(KEY_SHOW_TIME_LEFT_BAR, show).apply();
+    }
+
+    /**
+     * Charging pings + unplug alarm for this widget. {@code fallback} is used until this widget
+     * saves its own value (widgets created before the setting was per widget).
+     */
+    public static boolean getChargeAlerts(Context context, int widgetId, boolean fallback) {
+        return prefs(context, widgetId).getBoolean(KEY_CHARGE_ALERTS, fallback);
+    }
+
+    public static void setChargeAlerts(Context context, int widgetId, boolean enabled) {
+        prefs(context, widgetId).edit().putBoolean(KEY_CHARGE_ALERTS, enabled).apply();
+    }
+
+    /** "Speak battery %" step for this widget (0 = off); {@code fallback} as for getChargeAlerts. */
+    public static int getSpeakStep(Context context, int widgetId, int fallback) {
+        return prefs(context, widgetId).getInt(KEY_SPEAK_STEP, fallback);
+    }
+
+    public static void setSpeakStep(Context context, int widgetId, int step) {
+        prefs(context, widgetId).edit().putInt(KEY_SPEAK_STEP, Math.max(step, 0)).apply();
     }
 
     /** Copy of every stored value for this widget, for {@link #restore} (the settings screen's Undo). */

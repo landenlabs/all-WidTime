@@ -50,7 +50,7 @@ import java.util.function.Consumer;
 
 /**
  * Settings for one widget instance: its cities (each with its own text color, size, date/time
- * format and visibility), background, battery bars, and the app-wide charging alerts.
+ * format and visibility), background, battery bars, and its charging alert / speech choices.
  *
  * <p>There is no Save button: every change is written and the widget redrawn right away. Undo
  * puts back the values the screen opened with (a single level, as in All HomeWx).
@@ -83,10 +83,8 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
     /** True while controls are being filled in from storage, so their listeners don't save. */
     private boolean binding;
 
-    // Undo: the widget's stored values and the app-wide alert switch as they were on open.
+    // Undo: the widget's stored values (including its charging alert / speech choices) as on open.
     private Map<String, ?> openedPrefs;
-    private boolean openedChargeAlerts;
-    private int openedSpeakStep;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable timeTick = new Runnable() {
@@ -141,8 +139,6 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
         ((TextView) findViewById(R.id.config_title)).setText(getString(R.string.config_title, versionName()));
 
         openedPrefs = WidgetPrefs.snapshot(this, widgetId);
-        openedChargeAlerts = ChargeAlerts.isEnabled(this);
-        openedSpeakStep = ChargeAlerts.getSpeakStep(this);
 
         CollapsibleSection.bind(this, R.id.cities_header, R.id.cities_body, R.id.cities_chevron, "cities", true);
         CollapsibleSection.bind(this, R.id.background_header, R.id.background_body, R.id.background_chevron, "background", true);
@@ -395,7 +391,7 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
                 return;
             }
             // Started from this foreground screen, which Android 12+ requires for foreground services.
-            ChargeAlerts.setEnabled(this, checked);
+            ChargeAlerts.setEnabled(this, widgetId, checked);
             if (checked) {
                 ChargeAlerts.previewAlarm(this); // Let the user hear what the unplug alarm sounds like.
             }
@@ -424,11 +420,11 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 int step = ChargeLogic.SPEAK_STEPS[position];
-                if (binding || step == ChargeAlerts.getSpeakStep(WidgetConfigActivity.this)) {
+                if (binding || step == ChargeAlerts.getSpeakStep(WidgetConfigActivity.this, widgetId)) {
                     return; // Also swallows the spinner's initial selection callback.
                 }
                 // Started from this foreground screen, which Android 12+ requires for foreground services.
-                ChargeAlerts.setSpeakStep(WidgetConfigActivity.this, step);
+                ChargeAlerts.setSpeakStep(WidgetConfigActivity.this, widgetId, step);
                 if (step > 0) {
                     ChargeAlerts.previewSpeech(WidgetConfigActivity.this); // Sample of the voice and volume.
                 }
@@ -499,8 +495,8 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
 
             showBatteryBar.setChecked(WidgetPrefs.getShowBatteryBar(this, widgetId));
             showTimeLeftBar.setChecked(WidgetPrefs.getShowTimeLeftBar(this, widgetId));
-            chargeAlerts.setChecked(ChargeAlerts.isEnabled(this));
-            speakStep.setSelection(speakStepIndex(ChargeAlerts.getSpeakStep(this)), false);
+            chargeAlerts.setChecked(ChargeAlerts.isEnabled(this, widgetId));
+            speakStep.setSelection(speakStepIndex(ChargeAlerts.getSpeakStep(this, widgetId)), false);
             updateExactAlarmRow();
         } finally {
             binding = false;
@@ -509,12 +505,7 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
 
     private void undo() {
         WidgetPrefs.restore(this, widgetId, openedPrefs);
-        if (ChargeAlerts.isEnabled(this) != openedChargeAlerts) {
-            ChargeAlerts.setEnabled(this, openedChargeAlerts);
-        }
-        if (ChargeAlerts.getSpeakStep(this) != openedSpeakStep) {
-            ChargeAlerts.setSpeakStep(this, openedSpeakStep);
-        }
+        ChargeAlerts.settingsRestored(this); // The restored alert / speech choices may differ.
         bindCurrentValues();
         TimeWidgetProvider.updateAppWidget(this, AppWidgetManager.getInstance(this), widgetId);
         undoButton.setEnabled(false);

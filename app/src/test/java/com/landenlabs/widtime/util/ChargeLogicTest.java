@@ -120,4 +120,12 @@ public class ChargeLogicTest {
     public void speakOffNeverSpeaks() {
         assertTrue(spoken(0, 9, 10, 50, 100).isEmpty());
     }
+
+    @Test
+    public void combinedSpeakStepPicksSmallestOn() {
+        assertEquals(0, ChargeLogic.combinedSpeakStep(new int[0]));
+        assertEquals(0, ChargeLogic.combinedSpeakStep(new int[]{0, 0}));
+        assertEquals(20, ChargeLogic.combinedSpeakStep(new int[]{0, 20}));
+        assertEquals(10, ChargeLogic.combinedSpeakStep(new int[]{25, 0, 10, 20}));
+    }
 }

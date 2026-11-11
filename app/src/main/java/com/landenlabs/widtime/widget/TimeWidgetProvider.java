@@ -72,6 +72,8 @@ public class TimeWidgetProvider extends AppWidgetProvider {
         for (int widgetId : appWidgetIds) {
             WidgetPrefs.delete(context, widgetId);
         }
+        // The deleted widget may have been the only one with alerts or speech on.
+        ChargeAlerts.syncService(context);
     }
 
     public static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int widgetId) {
@@ -79,7 +81,7 @@ public class TimeWidgetProvider extends AppWidgetProvider {
 
         views.setInt(R.id.widget_root, "setBackgroundColor", WidgetPrefs.getBackgroundColor(context, widgetId));
         applyDynamicState(context, views, widgetId, BatteryStatus.refresh(context), ChargingInfo.read(context),
-                ChargeAlerts.isAlarmActive(context));
+                ChargeAlerts.isAlarmActive(context, widgetId));
 
         Intent serviceIntent = new Intent(context, CityRemoteViewsService.class);
         serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
@@ -118,7 +120,9 @@ public class TimeWidgetProvider extends AppWidgetProvider {
         boolean alarm = ChargeAlerts.isAlarmActive(context);
         for (int widgetId : widgetIds) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_time);
-            applyDynamicState(context, views, widgetId, status, charging, alarm);
+            // Only widgets with charging alerts on show the unplug alarm panel.
+            boolean widgetAlarm = alarm && ChargeAlerts.isEnabled(context, widgetId);
+            applyDynamicState(context, views, widgetId, status, charging, widgetAlarm);
             manager.partiallyUpdateAppWidget(widgetId, views);
         }
     }
@@ -162,7 +166,7 @@ public class TimeWidgetProvider extends AppWidgetProvider {
                 views.setTextViewText(R.id.charging_usb, charging.usbData);
                 styleText(views, R.id.charging_usb, color, size * 0.8f);
             }
-            applyBell(context, views, color, size);
+            applyBell(context, views, widgetId, color, size);
         }
         if (alarm) {
             views.setTextViewTextSize(R.id.alarm_headline, TypedValue.COMPLEX_UNIT_SP, size);
@@ -197,8 +201,9 @@ public class TimeWidgetProvider extends AppWidgetProvider {
     }
 
     /** Bell on the charging panel's right edge: mutes pings, speech + unplug alarm for this charge only. */
-    private static void applyBell(Context context, RemoteViews views, int color, float textSizeSp) {
-        if (!ChargeAlerts.hasChargingSounds(context)) {
+    private static void applyBell(Context context, RemoteViews views, int widgetId, int color,
+                                  float textSizeSp) {
+        if (!ChargeAlerts.hasChargingSounds(context, widgetId)) {
             views.setViewVisibility(R.id.charging_bell, View.GONE);
             return;
         }

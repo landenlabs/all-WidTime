@@ -92,6 +92,20 @@ public final class ChargeLogic {
     public static final int[] SPEAK_STEPS = {0, 5, 10, 20, 25};
 
     /**
+     * Speech is one voice for the whole device, but each widget picks its own step: use the
+     * smallest step any widget turned on (the most frequent announcements), or 0 if none did.
+     */
+    public static int combinedSpeakStep(int[] widgetSteps) {
+        int best = 0;
+        for (int step : widgetSteps) {
+            if (step > 0 && (best == 0 || step < best)) {
+                best = step;
+            }
+        }
+        return best;
+    }
+
+    /**
      * Whether to announce {@code level} while charging. {@code mark} is the highest
      * {@code level / step} reached this charge, or -1 before the first reading (which only sets it,
      * so plugging in at 47% stays quiet until 50%). Drops never speak and never lower the mark.

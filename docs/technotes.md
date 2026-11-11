@@ -12,7 +12,7 @@ Paths are under `app/src/main/java/com/landenlabs/widtime/`.
 | `widget/CityRemoteViewsService` + `CityRemoteViewsFactory` | `RemoteViewsService` | Fills the city `ListView`; formats each city's time with `ZonedDateTime.now(zone)`. |
 | `widget/BootReceiver` | manifest receiver | `BOOT_COMPLETED` / `MY_PACKAGE_REPLACED`: resets session state, restarts the monitor, re-sends `APPWIDGET_UPDATE` (which re-arms the tick). |
 | `alerts/ChargeMonitorService` | foreground service (`specialUse`) | Registers at runtime for `POWER_CONNECTED`, `POWER_DISCONNECTED`, `BATTERY_CHANGED`, `USB_STATE`. |
-| `alerts/ChargeAlerts` | static helper | All charging state and rules; state in SharedPreferences `charge_alerts`. |
+| `alerts/ChargeAlerts` | static helper | All charging state and rules; session state in SharedPreferences `charge_alerts`, per-widget switches in `widget_<id>`. |
 | `alerts/ChargeAlertReceiver` | non-exported receiver | AlarmManager ping / alarm events, notification Stop, widget bell tap. |
 | `alerts/SoundPlayer`, `alerts/Speaker` | helpers | Ping tone and alarm sound; text-to-speech announcements. |
 | `util/ChargeLogic`, `util/DischargeEstimator` | pure Java | Unit-tested rules (ping intervals, speed labels, USB label, speak steps, discharge math). |
@@ -90,6 +90,15 @@ Paths are under `app/src/main/java/com/landenlabs/widtime/`.
 - **State survives restarts.** It's all in SharedPreferences (`charge_alerts`), so events
   delivered by AlarmManager behave correctly after the process was killed. `onBoot` clears
   session, alarm, mute and speak state.
+- **Settings are per widget, sounds are per device.** The charging-alerts switch and the speak
+  step are stored in each widget's `widget_<id>` prefs (`charge_alerts`, `speak_step`), so Undo's
+  snapshot covers them. Widgets that never saved their own value fall back to the old app-wide
+  values in `charge_alerts` (`enabled`, `speak_step`), which are no longer written.
+  - Pings and the unplug alarm run once if *any* widget has alerts on (`ChargeAlerts.isEnabled(context)`).
+  - Speech uses the smallest step any widget turned on (`ChargeLogic.combinedSpeakStep`).
+  - Only widgets with alerts on show the alarm panel (`isAlarmActive(context, widgetId)`), and
+    each widget's bell follows its own settings. The mute and session state stay device-wide.
+  - Deleting a widget resyncs the monitor, in case it was the only one with alerts or speech on.
 
 ### Charging panel (widget)
 
@@ -166,13 +175,14 @@ Paths are under `app/src/main/java/com/landenlabs/widtime/`.
     stale level.
 - **When it's cleared:** on disconnect (before deciding whether to alarm), at a new session start,
   on boot, and when the monitor service is stopped.
-- **When it's hidden:** when neither pings/alarm nor speech is enabled
-  (`ChargeAlerts.hasChargingSounds`).
+- **When it's hidden:** when neither pings/alarm nor speech is enabled on that widget
+  (`ChargeAlerts.hasChargingSounds(context, widgetId)`).
 
 ## Speak battery %
 
 - **Setting.** Charging section of settings: Off (default) or every 5 / 10 / 20 / 25%. It's
-  app-wide (`speak_step`). Changing it resets the mark.
+  per widget (`speak_step` in `widget_<id>`); with several widgets the smallest step wins.
+  Changing it resets the mark.
 - **Rule** (in `ChargeLogic`, unit-tested). The mark is the highest `level / step` reached this
   charge (`speak_mark`, -1 = unarmed).
   - The first reading only arms the mark, so plugging in at 47% stays quiet until 50%.

@@ -21,6 +21,7 @@ import com.landenlabs.widtime.R;
 import com.landenlabs.widtime.ui.AlarmActivity;
 import com.landenlabs.widtime.util.ChargeLogic;
 import com.landenlabs.widtime.util.ChargingInfo;
+import com.landenlabs.widtime.util.WidgetPrefs;
 import com.landenlabs.widtime.widget.TimeWidgetProvider;
 
 /**
@@ -46,13 +47,14 @@ public final class ChargeAlerts {
     private static final int NOTIFICATION_ALARM = 2;
 
     private static final String PREFS = "charge_alerts";
+    /** Legacy app-wide switch; now per widget (WidgetPrefs), and only read as their fallback. */
     private static final String KEY_ENABLED = "enabled";
     private static final String KEY_SESSION = "charging_session";
     private static final String KEY_PINGS = "pings_played";
     private static final String KEY_ALARM = "alarm_active";
     /** Bell tapped off on the widget: no pings, speech or unplug alarm until this charge ends. */
     private static final String KEY_MUTED = "session_muted";
-    /** "Speak battery %" step (5, 10, 20, 25), or 0 for off. App-wide, like KEY_ENABLED. */
+    /** Legacy app-wide "Speak battery %" step; now per widget, and only read as their fallback. */
     private static final String KEY_SPEAK_STEP = "speak_step";
     /** Highest level / step announced (or passed) this charge; -1 until the first reading. */
     private static final String KEY_SPEAK_MARK = "speak_mark";
@@ -74,23 +76,64 @@ public final class ChargeAlerts {
         return context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
     }
 
-    public static boolean isEnabled(Context context) {
-        return prefs(context).getBoolean(KEY_ENABLED, true);
+    /** This widget's charging pings + unplug alarm switch. */
+    public static boolean isEnabled(Context context, int widgetId) {
+        return WidgetPrefs.getChargeAlerts(context, widgetId, legacyEnabled(context));
     }
 
-    public static void setEnabled(Context context, boolean enabled) {
-        prefs(context).edit().putBoolean(KEY_ENABLED, enabled).apply();
+    public static void setEnabled(Context context, int widgetId, boolean enabled) {
+        WidgetPrefs.setChargeAlerts(context, widgetId, enabled);
         syncService(context);
     }
 
-    public static int getSpeakStep(Context context) {
-        return prefs(context).getInt(KEY_SPEAK_STEP, 0);
+    /** This widget's "Speak battery %" step, 0 = off. */
+    public static int getSpeakStep(Context context, int widgetId) {
+        return WidgetPrefs.getSpeakStep(context, widgetId, legacySpeakStep(context));
     }
 
     /** 0 turns speech off. Re-arms the mark, so a change mid-charge starts from the current level. */
-    public static void setSpeakStep(Context context, int step) {
-        prefs(context).edit().putInt(KEY_SPEAK_STEP, Math.max(step, 0)).putInt(KEY_SPEAK_MARK, -1).apply();
+    public static void setSpeakStep(Context context, int widgetId, int step) {
+        WidgetPrefs.setSpeakStep(context, widgetId, step);
+        prefs(context).edit().putInt(KEY_SPEAK_MARK, -1).apply();
         syncService(context);
+    }
+
+    /** A widget's settings were replaced wholesale (Undo): re-arm speech and resync the monitor. */
+    public static void settingsRestored(Context context) {
+        prefs(context).edit().putInt(KEY_SPEAK_MARK, -1).apply();
+        syncService(context);
+    }
+
+    /**
+     * The device has one charger and one speaker, so pings and the unplug alarm run once,
+     * if any widget has them on.
+     */
+    static boolean isEnabled(Context context) {
+        for (int widgetId : widgetIds(context)) {
+            if (isEnabled(context, widgetId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** One voice for the device: the smallest step any widget turned on (ChargeLogic.combinedSpeakStep). */
+    static int getSpeakStep(Context context) {
+        int[] ids = widgetIds(context);
+        int[] steps = new int[ids.length];
+        for (int i = 0; i < ids.length; i++) {
+            steps[i] = getSpeakStep(context, ids[i]);
+        }
+        return ChargeLogic.combinedSpeakStep(steps);
+    }
+
+    /** Before these settings were per widget they were app-wide; widgets without their own value use it. */
+    private static boolean legacyEnabled(Context context) {
+        return prefs(context).getBoolean(KEY_ENABLED, true);
+    }
+
+    private static int legacySpeakStep(Context context) {
+        return prefs(context).getInt(KEY_SPEAK_STEP, 0);
     }
 
     /** Settings preview: the unplug alarm's sound, cut short. */
@@ -104,13 +147,19 @@ public final class ChargeAlerts {
         Speaker.speak(context, context.getString(R.string.speak_test, level >= 0 ? level : 50));
     }
 
-    /** Pings, unplug alarm, or speech: whether the widget's charging bell has anything to mute. */
-    public static boolean hasChargingSounds(Context context) {
-        return isEnabled(context) || getSpeakStep(context) > 0;
+    /** Pings, unplug alarm, or speech on this widget: whether its charging bell has anything to mute. */
+    public static boolean hasChargingSounds(Context context, int widgetId) {
+        return isEnabled(context, widgetId) || getSpeakStep(context, widgetId) > 0;
     }
 
+    /** The unplug alarm is sounding (device-wide). */
     public static boolean isAlarmActive(Context context) {
         return prefs(context).getBoolean(KEY_ALARM, false);
+    }
+
+    /** The unplug alarm is sounding and this widget asked for it, so it shows the alarm panel. */
+    public static boolean isAlarmActive(Context context, int widgetId) {
+        return isAlarmActive(context) && isEnabled(context, widgetId);
     }
 
     /** True if the user muted pings, speech and the unplug alarm for the current charging session. */
@@ -359,8 +408,12 @@ public final class ChargeAlerts {
     }
 
     private static boolean hasWidgets(Context context) {
+        return widgetIds(context).length > 0;
+    }
+
+    private static int[] widgetIds(Context context) {
         AppWidgetManager manager = AppWidgetManager.getInstance(context);
-        return manager.getAppWidgetIds(new ComponentName(context, TimeWidgetProvider.class)).length > 0;
+        return manager.getAppWidgetIds(new ComponentName(context, TimeWidgetProvider.class));
     }
 
     private static PendingIntent actionIntent(Context context, String action) {
