@@ -21,6 +21,7 @@ import com.landenlabs.widtime.util.BatteryStatus;
 import com.landenlabs.widtime.util.ChargeLogic;
 import com.landenlabs.widtime.util.ChargingInfo;
 import com.landenlabs.widtime.util.DischargeEstimator;
+import com.landenlabs.widtime.util.WidgetMode;
 import com.landenlabs.widtime.util.WidgetPrefs;
 
 import java.util.List;
@@ -124,6 +125,19 @@ public class TimeWidgetProvider extends AppWidgetProvider {
 
     private static void applyDynamicState(Context context, RemoteViews views, int widgetId,
                                           BatteryStatus status, ChargingInfo charging, boolean alarm) {
+        List<CityEntry> visible = WidgetPrefs.getVisibleCities(context, widgetId);
+
+        // Battery-only mode replaces the whole widget, charging or not; only the unplug alarm wins.
+        boolean batteryOnly = !alarm && WidgetMode.isBatteryOnly(visible.size(),
+                WidgetPrefs.getShowBatteryBar(context, widgetId),
+                WidgetPrefs.getShowTimeLeftBar(context, widgetId), status.levelPercent);
+        views.setViewVisibility(R.id.big_battery_panel, batteryOnly ? View.VISIBLE : View.GONE);
+        views.setViewVisibility(R.id.widget_content, batteryOnly ? View.GONE : View.VISIBLE);
+        if (batteryOnly) {
+            applyBigBatteryBar(context, views, status.levelPercent, charging.plugged);
+            return;
+        }
+
         applyBatteryBars(context, views, widgetId, status, charging.plugged);
 
         // At 100% the charge is done: back to the clocks (the battery bar stays while plugged).
@@ -133,7 +147,6 @@ public class TimeWidgetProvider extends AppWidgetProvider {
         views.setViewVisibility(R.id.city_area, alarm || showCharging ? View.GONE : View.VISIBLE);
 
         // The charging and alarm panels take the first visible city's style.
-        List<CityEntry> visible = WidgetPrefs.getVisibleCities(context, widgetId);
         CityEntry style = visible.isEmpty() ? WidgetPrefs.defaultStyle(context, widgetId) : visible.get(0);
         int color = style.textColor;
         float size = style.textSizeSp;
@@ -222,6 +235,21 @@ public class TimeWidgetProvider extends AppWidgetProvider {
                     ? 0 : DischargeEstimator.percentOfFullScale(status.hoursLeft);
             setBar(views, R.id.time_left_bar, percent);
         }
+    }
+
+    /** The battery-only bar: level fill and centered percent; brighter fill and a bolt while plugged. */
+    private static void applyBigBatteryBar(Context context, RemoteViews views, int levelPercent,
+                                           boolean plugged) {
+        int color = DischargeEstimator.colorForPercent(levelPercent);
+        if (plugged) {
+            color = WidgetMode.blendTowardWhite(color, WidgetMode.CHARGING_WHITEN);
+        }
+        views.setInt(R.id.big_battery_bar, "setImageLevel", levelPercent * 100);
+        views.setInt(R.id.big_battery_bar, "setColorFilter", color);
+        views.setTextViewText(R.id.big_battery_text, context.getString(
+                plugged ? R.string.big_battery_text_charging : R.string.big_battery_text, levelPercent));
+        views.setContentDescription(R.id.big_battery_text, context.getString(
+                plugged ? R.string.big_battery_desc_charging : R.string.big_battery_desc, levelPercent));
     }
 
     private static void setBar(RemoteViews views, int viewId, double percent) {

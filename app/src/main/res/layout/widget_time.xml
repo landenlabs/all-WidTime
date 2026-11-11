@@ -1,122 +1,183 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/widget_background"
-    android:orientation="vertical">
+    android:background="@drawable/widget_background">
 
-    <ImageView
-        android:id="@+id/battery_bar"
-        style="@style/BatteryBarStyle"
-        android:contentDescription="@string/battery_bar_label" />
-
-    <FrameLayout
+    <!-- Normal layout: bars, cities / charging / alarm. Hidden in battery-only mode. -->
+    <LinearLayout
+        android:id="@+id/widget_content"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="4dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <!-- Normal mode: cities. Hidden while charging or while the unplug alarm is active. -->
+        <ImageView
+            android:id="@+id/battery_bar"
+            style="@style/BatteryBarStyle"
+            android:contentDescription="@string/battery_bar_label" />
+
         <FrameLayout
-            android:id="@+id/city_area"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="4dp">
 
-            <ListView
-                android:id="@+id/widget_list"
+            <!-- Normal mode: cities. Hidden while charging or while the unplug alarm is active. -->
+            <FrameLayout
+                android:id="@+id/city_area"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ListView
+                    android:id="@+id/widget_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@null"
+                    android:dividerHeight="6dp" />
+
+                <TextView
+                    android:id="@+id/widget_empty_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/widget_empty"
+                    android:textColor="#CCFFFFFF"
+                    android:textSize="12sp" />
+            </FrameLayout>
+
+            <!-- Charging: left-justified text, bell (mute alarm for this charge) on the right edge. -->
+            <LinearLayout
+                android:id="@+id/charging_panel"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:divider="@null"
-                android:dividerHeight="6dp" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
 
-            <TextView
-                android:id="@+id/widget_empty_view"
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="start"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/charging_headline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/charging_detail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true" />
+
+                    <!-- Wired only: whether the cable / host carries USB data. -->
+                    <TextView
+                        android:id="@+id/charging_usb"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:visibility="gone" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/charging_bell"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="4dp"
+                    android:contentDescription="@string/bell_on_desc"
+                    android:padding="4dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_bell" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/alarm_panel"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="@string/widget_empty"
-                android:textColor="#CCFFFFFF"
-                android:textSize="12sp" />
-        </FrameLayout>
-
-        <!-- Charging: left-justified text, bell (mute alarm for this charge) on the right edge. -->
-        <LinearLayout
-            android:id="@+id/charging_panel"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="start"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
-                    android:id="@+id/charging_headline"
+                    android:id="@+id/alarm_headline"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
+                    android:text="@string/widget_alarm_headline"
+                    android:textColor="#FFF44336"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/charging_detail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:singleLine="true" />
-
-                <!-- Wired only: whether the cable / host carries USB data. -->
-                <TextView
-                    android:id="@+id/charging_usb"
+                    android:id="@+id/alarm_detail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
-                    android:visibility="gone" />
+                    android:text="@string/widget_alarm_detail" />
             </LinearLayout>
+        </FrameLayout>
 
-            <ImageView
-                android:id="@+id/charging_bell"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginStart="4dp"
-                android:contentDescription="@string/bell_on_desc"
-                android:padding="4dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_bell" />
-        </LinearLayout>
+        <ImageView
+            android:id="@+id/time_left_bar"
+            style="@style/BatteryBarStyle"
+            android:contentDescription="@string/time_left_bar_label" />
+    </LinearLayout>
+
+    <!-- Battery-only mode (no cities, only the level bar on): one large bar, 80% of the widget
+         each way (10% border), with the percent centered over it. Taps fall through to widget_root. -->
+    <LinearLayout
+        android:id="@+id/big_battery_panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:weightSum="10">
 
         <LinearLayout
-            android:id="@+id/alarm_panel"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="8"
             android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone">
+            android:orientation="horizontal"
+            android:weightSum="10">
 
-            <TextView
-                android:id="@+id/alarm_headline"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:text="@string/widget_alarm_headline"
-                android:textColor="#FFF44336"
-                android:textStyle="bold" />
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="8">
 
-            <TextView
-                android:id="@+id/alarm_detail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:text="@string/widget_alarm_detail" />
+                <ImageView
+                    android:id="@+id/big_battery_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/battery_track_textured"
+                    android:importantForAccessibility="no"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/battery_bar_fill" />
+
+                <TextView
+                    android:id="@+id/big_battery_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="200sp"
+                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeTextType="uniform"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:shadowColor="#CC000000"
+                    android:shadowDx="0"
+                    android:shadowDy="1"
+                    android:shadowRadius="4"
+                    android:textColor="#FFFFFFFF"
+                    android:textStyle="bold" />
+            </FrameLayout>
         </LinearLayout>
-    </FrameLayout>
-
-    <ImageView
-        android:id="@+id/time_left_bar"
-        style="@style/BatteryBarStyle"
-        android:contentDescription="@string/time_left_bar_label" />
-</LinearLayout>
+    </LinearLayout>
+</FrameLayout>

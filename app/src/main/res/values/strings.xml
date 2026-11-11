@@ -21,7 +21,11 @@
     <string name="section_battery">Battery</string>
     <string name="battery_bar_label">Battery level bar (top)</string>
     <string name="time_left_bar_label">Battery time left bar (bottom, full = 24 h)</string>
-    <string name="battery_bar_help">Green above 60%, yellow 40–60%, red below 40%. Time left is estimated from how fast the battery drains while unplugged, so it fills in after the level drops a couple of percent.</string>
+    <string name="big_battery_text">%1$d%%</string>
+    <string name="big_battery_text_charging">⚡ %1$d%%</string>
+    <string name="big_battery_desc">Battery %1$d%%</string>
+    <string name="big_battery_desc_charging">Battery %1$d%%, charging</string>
+    <string name="battery_bar_help">Green above 60%, yellow 40–60%, red below 40%. Time left is estimated from how fast the battery drains while unplugged, so it fills in after the level drops a couple of percent. With no cities shown and only the level bar on, the whole widget becomes one large battery bar (brighter, with ⚡, while charging).</string>
     <string name="section_charging">Charging</string>
     <string name="charge_alerts_label">Charging pings &amp; unplug alarm</string>
     <string name="charge_alerts_help">While charging the widget shows battery level, speed and current instead of the clocks. Pings every 2 min (5x), then every 5 min (5x), then every 10 min. When the charger is pulled, a 5 s alarm repeats every 5 min until you tap Stop. At 100% the widget shows the clocks again; after one final ping (or “Fully charged”), pings, speech and the unplug alarm stay quiet until the next charge. Tap the bell on the charging widget to mute charging sounds for the current charge only. Applies to all widgets and keeps a silent "Watching charger" notification.</string>

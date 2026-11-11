@@ -53,6 +53,18 @@ Paths are under `app/src/main/java/com/landenlabs/widtime/`.
   - While charging, the last measured rate is applied to the current level.
   - Before any rate exists, it uses the charge counter ÷ current draw if the device reports them.
     Otherwise the bar shows an empty track.
+- **Battery-only mode.** When a widget has no visible cities, the level bar is on and the time-left
+  bar is off (`WidgetMode.isBatteryOnly`), `widget_content` is hidden and `big_battery_panel`
+  covers the whole widget instead: one large bar at 80% of the widget's width and height (10%
+  border each side, via `weightSum` + gravity, since `Space` isn't allowed in `RemoteViews`), with
+  the percent auto-sized and centered over it.
+  - The track is `battery_track_textured` (dark fill + a tiled hatch PNG). The fill uses the same
+    clip drawable and colors as the top bar, blended 40% toward white with a ⚡ in the text while
+    plugged in.
+  - It stays up while charging and at 100%: the charging panel and its bell are not shown, so
+    there is no per-charge mute here. Sounds, speech and the unplug alarm still run. While the
+    unplug alarm is active the normal layout returns with the alarm panel filling it.
+  - Taps fall through to `widget_root` and open settings.
 
 ## Charger monitoring
 

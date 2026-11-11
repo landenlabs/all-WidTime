@@ -19,7 +19,7 @@
 An Android (Java) home screen **widget** that shows the current date and time for cities you
 choose from around the world. Each widget has its own list of cities, colors, text size and
 date/time format. Optional battery bars show the battery level and an estimate of the time
-left. While the phone is charging the widget shows charging details instead, and an alarm
+left, or, with no cities, the whole widget can be one large battery bar. While the phone is charging the widget shows charging details instead, and an alarm
 sounds if the charger is unplugged.
 
 **By [LanDen Labs](https://github.com/landenlabs) (2026)**
@@ -38,6 +38,11 @@ sounds if the charger is unplugged.
     <td><b>Settings: cities and appearance</b><br><img src="screens/settings-1.png" width="100%" alt="Configure screen with cities, text color, text size and date/time format"></td>
     <td><b>Settings: preview and background</b><br><img src="screens/settings-2.png" width="100%" alt="Configure screen with preview, background color and opacity, battery bars"></td>
     <td><b>Settings: battery and charging</b><br><img src="screens/settings-3.png" width="100%" alt="Configure screen with battery bars, charging alarm option and Save"></td>
+  </tr>
+  <tr>
+    <td><b>Battery only</b><br><img src="screens/batter-bar.png" width="100%" alt="Battery-only widget: a large bar at 77% with a lightning bolt while charging, above the normal charging widget"></td>
+    <td></td>
+    <td></td>
   </tr>
 </table>
 
@@ -63,6 +68,12 @@ sounds if the charger is unplugged.
 - Optional time-left bar along the bottom, where a full bar is 24 hours. Android has no public
   "time until empty" API, so the app measures how fast the level drops while unplugged. The
   bar fills in after the level has dropped a couple of percent.
+- **Battery-only mode.** With no cities shown and only the level bar turned on (time-left bar off),
+  the whole widget becomes one large battery bar: 80% of the widget's width and height, over a
+  dark textured track, with the percent in large text across the middle. It stays up while
+  charging, when the bar turns a brighter shade and shows ⚡. Charging pings, speech and the
+  unplug alarm still work, and the alarm takes over the widget while it sounds. Tap the widget
+  to open settings.
 
 **Charging pings and unplug alarm** (optional)
 - While charging, the widget shows battery level, charge speed (slow, fast, super fast),
@@ -110,7 +121,7 @@ Outputs are named after the version, for example `WidTime-1.0-debug.apk`. The Pl
 ./gradlew bundleRelease
 ```
 
-Unit tests for the charging and battery estimate logic run with:
+Unit tests for the charging, battery estimate and widget mode logic run with:
 
 ```
 ./gradlew test
