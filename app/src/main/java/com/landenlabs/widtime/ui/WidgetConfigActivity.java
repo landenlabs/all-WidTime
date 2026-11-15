@@ -1,3 +1,8 @@
+// ----------------------------------------------------------------------
+// Copyright (c) 2026 LanDen Labs - Dennis Lang
+// https://landenlabs.com
+// ----------------------------------------------------------------------
+
 package com.landenlabs.widtime.ui;
 
 import android.Manifest;
@@ -158,6 +163,12 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
         bindCurrentValues();
         // A new widget has charging alerts on by default; start the monitor from this foreground screen.
         ChargeAlerts.syncService(this);
+
+        // Offer a Play Store update once per opening of settings (not again on rotation).
+        PlayUpdateChecker updateChecker = new PlayUpdateChecker(this);
+        if (savedInstanceState == null) {
+            updateChecker.check();
+        }
     }
 
     /**

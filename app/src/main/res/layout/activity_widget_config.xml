@@ -47,6 +47,10 @@
             <View style="@style/SectionDividerStyle" />
 
             <include layout="@layout/section_charging" />
+
+            <View style="@style/SectionDividerStyle" />
+
+            <include layout="@layout/section_copyright" />
         </LinearLayout>
     </ScrollView>
 

@@ -56,6 +56,17 @@
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
+        <!-- Launcher icon: explains the widget, pins one, and opens each widget's settings. -->
+        <activity
+            android:name=".ui.LauncherActivity"
+            android:exported="true"
+            android:theme="@style/Theme.WidTime.Config">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".ui.WidgetConfigActivity"
             android:exported="true"
@@ -71,7 +82,7 @@
             android:foregroundServiceType="specialUse">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Listens for charger connect/disconnect to play charging pings and an unplug alarm" />
+                android:value="Listens for charger connect/disconnect to play charging pings, speak the battery level while charging, and sound an unplug alarm" />
         </service>
 
         <receiver

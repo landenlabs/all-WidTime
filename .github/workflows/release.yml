@@ -1,0 +1,49 @@
+name: Build and Release
+
+# Push a vX.Y.Z tag (matching app/build.gradle's versionName) to build a
+# signed release APK and publish it as a GitHub Release.
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      # Release signing key, kept out of the repo. Store as repo secrets:
+      #   KEYSTORE_BASE64    -- base64 -i release.keystore | pbcopy
+      #   KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD
+      # app/build.gradle's release signingConfig reads the CI_* env vars below.
+      # Missing secrets make the build fail at signing rather than publish an
+      # unsigned APK.
+      - name: Restore release keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > "$RUNNER_TEMP/release.keystore"
+
+      - name: Build signed release APK
+        env:
+          CI_KEYSTORE_PATH: ${{ runner.temp }}/release.keystore
+          CI_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          CI_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          CI_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew assembleRelease --no-daemon
+
+      # APK is named via archivesName, e.g. WidTime-6.11.14-release.apk
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: app/build/outputs/apk/release/*.apk

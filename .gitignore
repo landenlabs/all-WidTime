@@ -13,3 +13,9 @@ captures/
 
 # Private notes/scripts (Play Store video, etc.) - never in this public repo
 private/
+
+# Local Play Console setup notes (declarations, Data safety answers) - not published
+playstore-setup.md
+
+# Play Store listing assets (graphics, screenshots, listing text)
+play-store/

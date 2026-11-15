@@ -107,6 +107,8 @@
     <string name="undo">Undo</string>
     <string name="undo_help">Changes are saved as you make them. Undo restores the settings you had when you opened this screen.</string>
     <string name="undo_done">Settings restored</string>
+    <string name="update_downloaded">An update has been downloaded</string>
+    <string name="update_restart">Restart</string>
     <string name="privacy">Privacy</string>
     <string name="privacy_title">Privacy policy</string>
     <string name="privacy_open_web">Open web page</string>
@@ -119,4 +121,19 @@
 <p><b>Deleting data:</b> removing a widget deletes its settings. Uninstalling the app or clearing its storage deletes everything.</p>
 <p>Questions: landenlabs.app@gmail.com</p>
 ]]></string>
+    <!-- Launcher icon screen (LauncherActivity) -->
+    <string name="launcher_version">Version %1$s</string>
+    <string name="launcher_intro">All World Time is a home screen widget. It shows the time in the cities you choose, with optional battery bars and charging alerts.</string>
+    <string name="launcher_add_widget">Add widget to home screen</string>
+    <string name="launcher_how_to_add">Or long-press your home screen, tap Widgets, and drag all World Time onto the screen. Its settings open when you add it, and any time you tap the widget.</string>
+    <string name="launcher_your_widgets">Your widgets</string>
+    <string name="launcher_no_widgets">No widgets on the home screen yet.</string>
+    <string name="launcher_widget_item">Widget %1$d: %2$s</string>
+    <string name="launcher_widget_no_cities">no cities</string>
+
+    <!-- Settings screen: copyright section -->
+    <string name="section_copyright">Copyright</string>
+    <string name="copyright_text" translatable="false">Copyright 2026 Dennis Lang (LanDen Labs)</string>
+    <string name="copyright_license">Licensed under the Apache License, Version 2.0 (the \"License\"); you may not use this app except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software distributed under the License is distributed on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</string>
+    <string name="copyright_source">Source code: https://github.com/landenlabs/all-WidTime</string>
 </resources>

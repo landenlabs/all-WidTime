@@ -75,7 +75,7 @@ sounds if the charger is unplugged.
   unplug alarm still work, and the alarm takes over the widget while it sounds. Tap the widget
   to open settings.
 
-**Charging pings and unplug alarm** (optional)
+**Charging pings and unplug alarm** (optional, off by default; turn on under **Charging**)
 - While charging, the widget shows battery level, charge speed (slow, fast, super fast),
   power source (AC, USB, wireless, dock) and current, in place of the clocks.
 - A short ping plays every 2 minutes (5 times), then every 5 minutes (5 times), then every

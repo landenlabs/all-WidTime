@@ -1,3 +1,8 @@
+// ----------------------------------------------------------------------
+// Copyright (c) 2026 LanDen Labs - Dennis Lang
+// https://landenlabs.com
+// ----------------------------------------------------------------------
+
 package com.landenlabs.widtime.alerts;
 
 import android.Manifest;
@@ -129,7 +134,7 @@ public final class ChargeAlerts {
 
     /** Before these settings were per widget they were app-wide; widgets without their own value use it. */
     private static boolean legacyEnabled(Context context) {
-        return prefs(context).getBoolean(KEY_ENABLED, true);
+        return prefs(context).getBoolean(KEY_ENABLED, false);
     }
 
     private static int legacySpeakStep(Context context) {

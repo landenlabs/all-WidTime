@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings screen: copyright, license and source link. Not collapsible.
+     autoLink makes the URLs tappable. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="8dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:gravity="center_vertical"
+        android:text="@string/section_copyright"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/copyright_text"
+        android:textSize="14sp" />
+
+    <TextView
+        style="@style/HelpTextStyle"
+        android:layout_marginTop="8dp"
+        android:autoLink="web"
+        android:linksClickable="true"
+        android:text="@string/copyright_license" />
+
+    <TextView
+        style="@style/HelpTextStyle"
+        android:layout_marginTop="12dp"
+        android:autoLink="web"
+        android:linksClickable="true"
+        android:text="@string/copyright_source"
+        android:textSize="13sp" />
+</LinearLayout>

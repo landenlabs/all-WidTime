@@ -1,3 +1,8 @@
+// ----------------------------------------------------------------------
+// Copyright (c) 2026 LanDen Labs - Dennis Lang
+// https://landenlabs.com
+// ----------------------------------------------------------------------
+
 package com.landenlabs.widtime.data;
 
 import com.landenlabs.widtime.model.City;
