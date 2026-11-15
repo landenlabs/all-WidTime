@@ -10,8 +10,8 @@ android {
         applicationId = "com.landenlabs.widtime"
         minSdk = 26
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 61114
+        versionName = "6.11.14"
     }
 
     buildTypes {
