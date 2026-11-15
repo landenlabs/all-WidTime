@@ -20,6 +20,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.landenlabs.widtime.R;
+import com.landenlabs.widtime.ui.LauncherActivity;
 import com.landenlabs.widtime.util.ChargingInfo;
 import com.landenlabs.widtime.widget.TimeWidgetProvider;
 
@@ -107,6 +108,7 @@ public class ChargeMonitorService extends Service {
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setOngoing(true)
                 .setSilent(true)
+                .setContentIntent(LauncherActivity.fromMonitorIntent(this))
                 .build();
     }
 }

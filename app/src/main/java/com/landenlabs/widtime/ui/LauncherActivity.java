@@ -5,8 +5,10 @@
 
 package com.landenlabs.widtime.ui;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -20,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
 import com.landenlabs.widtime.R;
+import com.landenlabs.widtime.alerts.ChargeAlerts;
 import com.landenlabs.widtime.model.CityEntry;
 import com.landenlabs.widtime.util.WidgetPrefs;
 import com.landenlabs.widtime.widget.TimeWidgetProvider;
@@ -37,9 +40,27 @@ public class LauncherActivity extends AppCompatActivity {
     private LinearLayout widgetList;
     private TextView noWidgets;
 
+    /** Set by the "Watching charger" notification's tap (see ChargeMonitorService). */
+    private static final String EXTRA_FROM_MONITOR = "from_monitor";
+
+    /**
+     * Tap action for the "Watching charger" notification. Which widget to open is decided at tap
+     * time (see openMonitoredWidget), since widgets can be added or removed while it is showing.
+     */
+    public static PendingIntent fromMonitorIntent(Context context) {
+        Intent intent = new Intent(context, LauncherActivity.class)
+                .putExtra(EXTRA_FROM_MONITOR, true)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        return PendingIntent.getActivity(context, 6, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState == null && openMonitoredWidget(getIntent())) {
+            return;
+        }
         setContentView(R.layout.activity_launcher);
         SystemBarInsets.apply(this);
 
@@ -81,6 +102,31 @@ public class LauncherActivity extends AppCompatActivity {
             widgetList.addView(button, new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
+    }
+
+    /**
+     * From the notification: if exactly one widget has charge alerts or speech on, open its
+     * settings instead of this screen. Otherwise (none or several) this screen's list is shown.
+     */
+    private boolean openMonitoredWidget(Intent intent) {
+        if (intent == null || !intent.getBooleanExtra(EXTRA_FROM_MONITOR, false)) {
+            return false;
+        }
+        int match = AppWidgetManager.INVALID_APPWIDGET_ID;
+        for (int widgetId : AppWidgetManager.getInstance(this).getAppWidgetIds(widgetProvider())) {
+            if (ChargeAlerts.isEnabled(this, widgetId) || ChargeAlerts.getSpeakStep(this, widgetId) > 0) {
+                if (match != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                    return false;
+                }
+                match = widgetId;
+            }
+        }
+        if (match == AppWidgetManager.INVALID_APPWIDGET_ID) {
+            return false;
+        }
+        openSettings(match);
+        finish();
+        return true;
     }
 
     private String citySummary(int widgetId) {
