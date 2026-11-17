@@ -37,6 +37,7 @@ import com.landenlabs.widtime.widget.TimeWidgetProvider;
  *   <li>Charger connected: a ping every 2 min (x5), then every 5 min (x5), then every 10 min.</li>
  *   <li>Charger disconnected: 5 s of alarm, 5 min pause, repeated until the user taps Stop
  *       (notification, alarm screen, or widget) or the charger is reconnected.</li>
+ *   <li>Battery below 20% while unplugged: one low battery sound, re-armed above 30%.</li>
  * </ul>
  */
 public final class ChargeAlerts {
@@ -69,6 +70,11 @@ public final class ChargeAlerts {
      * pings, speech and the unplug alarm stay quiet until the next charging session starts.
      */
     private static final String KEY_FULL_DONE = "full_alert_done";
+    /**
+     * The low battery alert may sound (true until it has, then false until the battery is charged
+     * above 30%). Kept across reboots, so a restart while still low doesn't repeat it.
+     */
+    private static final String KEY_LOW_ARMED = "low_battery_armed";
     /** A ping this soon after an announcement is silent, so the two don't overlap. */
     private static final long PING_AFTER_SPEECH_GAP_MILLIS = 60_000L;
     /** How long the settings screen plays the alarm sound when the alarm is switched on. */
@@ -101,6 +107,31 @@ public final class ChargeAlerts {
         WidgetPrefs.setSpeakStep(context, widgetId, step);
         prefs(context).edit().putInt(KEY_SPEAK_MARK, -1).apply();
         syncService(context);
+    }
+
+    /** This widget's low battery alert switch (sounds once below 20%, re-arms above 30%). */
+    public static boolean isLowBatteryAlertEnabled(Context context, int widgetId) {
+        return WidgetPrefs.getLowBatteryAlert(context, widgetId);
+    }
+
+    public static void setLowBatteryAlertEnabled(Context context, int widgetId, boolean enabled) {
+        WidgetPrefs.setLowBatteryAlert(context, widgetId, enabled);
+        syncService(context);
+    }
+
+    /** One battery: the low battery alert sounds once if any widget has it on. */
+    static boolean isLowBatteryAlertEnabled(Context context) {
+        for (int widgetId : widgetIds(context)) {
+            if (isLowBatteryAlertEnabled(context, widgetId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Settings preview: the low battery sound. */
+    public static void previewLowBattery(Context context) {
+        SoundPlayer.playLowBattery(context);
     }
 
     /** A widget's settings were replaced wholesale (Undo): re-arm speech and resync the monitor. */
@@ -212,7 +243,7 @@ public final class ChargeAlerts {
                 stopAlarm(context);
             }
         }
-        if (alerts || (widgets && getSpeakStep(context) > 0)) {
+        if (alerts || (widgets && (getSpeakStep(context) > 0 || isLowBatteryAlertEnabled(context)))) {
             try {
                 ContextCompat.startForegroundService(context, service);
             } catch (IllegalStateException ignored) {
@@ -312,6 +343,7 @@ public final class ChargeAlerts {
      * "Charged to N percent" each time the level reaches a new step; see ChargeLogic.shouldSpeak.
      */
     static void onBatteryLevel(Context context, int levelPercent, boolean plugged) {
+        checkLowBattery(context, levelPercent, plugged);
         int step = getSpeakStep(context);
         SharedPreferences p = prefs(context);
         int mark = p.getInt(KEY_SPEAK_MARK, -1);
@@ -339,6 +371,27 @@ public final class ChargeAlerts {
         }
         if (full) {
             markFullAlertDone(context); // "Fully charged" replaces any further pings.
+        }
+    }
+
+    /**
+     * Sounds once when the level drops below 20% while unplugged, then waits for a charge above 30%
+     * before it can sound again. While the alert is off, a charge above 30% still re-arms it, and
+     * a drop below 20% doesn't use it up, so switching it on later starts from a correct state.
+     */
+    private static void checkLowBattery(Context context, int levelPercent, boolean plugged) {
+        SharedPreferences p = prefs(context);
+        boolean armed = p.getBoolean(KEY_LOW_ARMED, true);
+        boolean alert = ChargeLogic.shouldAlertLowBattery(armed, levelPercent, plugged);
+        boolean next = ChargeLogic.nextLowBatteryArmed(armed, levelPercent, plugged);
+        if (alert) {
+            if (!isLowBatteryAlertEnabled(context)) {
+                return;
+            }
+            SoundPlayer.playLowBattery(context);
+        }
+        if (next != armed) {
+            p.edit().putBoolean(KEY_LOW_ARMED, next).apply();
         }
     }
 

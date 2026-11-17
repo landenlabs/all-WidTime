@@ -133,4 +133,31 @@ public class ChargeLogicTest {
         assertEquals(20, ChargeLogic.combinedSpeakStep(new int[]{0, 20}));
         assertEquals(10, ChargeLogic.combinedSpeakStep(new int[]{25, 0, 10, 20}));
     }
+
+    @Test
+    public void lowBatteryAlertsOnceUntilChargedAboveThirty() {
+        boolean armed = true;
+        int alerts = 0;
+        // Drain to 10%, charge to 30% (not enough to re-arm), drain again, charge to 31%, drain.
+        int[] levels = {25, 20, 19, 18, 10, 15, 30, 25, 19, 10, 31, 22, 19};
+        boolean[] plugged = {false, false, false, false, false, true, true, false, false, false, true, false, false};
+        int[] alertAt = new int[levels.length];
+        for (int i = 0; i < levels.length; i++) {
+            if (ChargeLogic.shouldAlertLowBattery(armed, levels[i], plugged[i])) {
+                alertAt[alerts++] = i;
+            }
+            armed = ChargeLogic.nextLowBatteryArmed(armed, levels[i], plugged[i]);
+        }
+        assertEquals(2, alerts);
+        assertEquals(2, alertAt[0]);  // First reading below 20%.
+        assertEquals(12, alertAt[1]); // Only after the charge above 30%.
+    }
+
+    @Test
+    public void lowBatteryIgnoresUnknownLevelAndCharging() {
+        assertTrue(!ChargeLogic.shouldAlertLowBattery(true, -1, false));
+        assertTrue(!ChargeLogic.shouldAlertLowBattery(true, 5, true));
+        assertTrue(ChargeLogic.nextLowBatteryArmed(true, 5, true)); // Still armed for after unplug.
+        assertTrue(!ChargeLogic.nextLowBatteryArmed(false, -1, false));
+    }
 }

@@ -93,6 +93,27 @@ public final class ChargeLogic {
         return levelPercent >= 100;
     }
 
+    /** The low battery alert sounds when the level drops below this... */
+    public static final int LOW_BATTERY_ALERT_BELOW = 20;
+    /** ...and is re-armed only once the battery is charged above this. */
+    public static final int LOW_BATTERY_REARM_ABOVE = 30;
+
+    /** Whether to sound the low battery alert now. Unknown levels (-1) and charging never sound. */
+    public static boolean shouldAlertLowBattery(boolean armed, int level, boolean plugged) {
+        return armed && !plugged && level >= 0 && level < LOW_BATTERY_ALERT_BELOW;
+    }
+
+    /**
+     * Armed state after seeing {@code level}: sounding disarms, and it stays disarmed (so it
+     * sounds once per drain) until the level climbs above {@link #LOW_BATTERY_REARM_ABOVE}.
+     */
+    public static boolean nextLowBatteryArmed(boolean armed, int level, boolean plugged) {
+        if (shouldAlertLowBattery(armed, level, plugged)) {
+            return false;
+        }
+        return armed || level > LOW_BATTERY_REARM_ABOVE;
+    }
+
     /** "Speak battery %" choices; 0 = off (the default). */
     public static final int[] SPEAK_STEPS = {0, 5, 10, 20, 25};
 

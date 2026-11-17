@@ -36,6 +36,8 @@
     <string name="speak_charged">Charged to %1$d percent</string>
     <string name="speak_test">Voice test. Charged to %1$d percent</string>
     <string name="speak_full">Fully charged</string>
+    <string name="low_battery_alert_label">Alert when battery is below 20%</string>
+    <string name="low_battery_alert_help">Sounds once when the battery drops below 20% while unplugged. It won\'t sound again until the battery has been charged above 30%. Uses the notification volume; vibrates instead when the phone is on vibrate, and stays quiet on silent. Set per widget: sounds once if any widget has it on.</string>
     <string name="boot_tone_label">Chime when the phone has started</string>
     <string name="boot_tone_help">After a restart, plays a short chime once the phone reaches the lock screen and is ready to use. Uses the notification volume, so it is silent on vibrate or silent. Set per widget: plays once if any widget has it on.</string>
     <string name="channel_monitor">Charger monitor</string>

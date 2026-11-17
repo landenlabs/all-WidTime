@@ -12,7 +12,7 @@ Paths are under `app/src/main/java/com/landenlabs/widtime/`.
 | `widget/CityRemoteViewsService` + `CityRemoteViewsFactory` | `RemoteViewsService` | Fills the city `ListView`; formats each city's time with `ZonedDateTime.now(zone)`. |
 | `widget/BootReceiver` | manifest receiver | `BOOT_COMPLETED` / `MY_PACKAGE_REPLACED`: resets session state, restarts the monitor, re-sends `APPWIDGET_UPDATE` (which re-arms the tick). |
 | `alerts/ChargeMonitorService` | foreground service (`specialUse`) | Registers at runtime for `POWER_CONNECTED`, `POWER_DISCONNECTED`, `BATTERY_CHANGED`, `USB_STATE`. |
-| `alerts/ChargeAlerts` | static helper | All charging state and rules; session state in SharedPreferences `charge_alerts`, per-widget switches in `widget_<id>`. |
+| `alerts/ChargeAlerts` | static helper | All charging and low battery state and rules; session state in SharedPreferences `charge_alerts`, per-widget switches in `widget_<id>`. |
 | `alerts/ChargeAlertReceiver` | non-exported receiver | AlarmManager ping / alarm events, notification Stop, widget bell tap. |
 | `alerts/BootTone` | direct-boot-aware receiver | `LOCKED_BOOT_COMPLETED`: optional synthesized chime at the lock screen. Reads a "any widget has it on" copy kept in device-protected storage, which `ChargeAlerts.syncService` refreshes. |
 | `alerts/SoundPlayer`, `alerts/Speaker` | helpers | Ping tone and alarm sound; text-to-speech announcements. |

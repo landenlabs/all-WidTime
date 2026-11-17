@@ -12,9 +12,13 @@ import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.media.ToneGenerator;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.os.VibratorManager;
 
 import com.landenlabs.widtime.util.ChargeLogic;
 
@@ -23,6 +27,9 @@ final class SoundPlayer {
 
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
     private static final int PING_MILLIS = 300;
+    private static final int LOW_BATTERY_MILLIS = 1_000;
+    /** Off / on pairs in ms: three 400 ms buzzes, 1.6 s in total. */
+    private static final long[] LOW_BATTERY_VIBRATE_PATTERN = {0, 400, 200, 400, 200, 400};
 
     private static MediaPlayer alarmPlayer;
     private static ToneGenerator alarmTone;
@@ -41,6 +48,50 @@ final class SoundPlayer {
         } catch (RuntimeException ignored) {
             // Audio unavailable right now (e.g. during a call); skip this ping.
         }
+    }
+
+    /**
+     * "Battery low", following the phone's ringer mode: low double beeps on the notification
+     * stream (at the notification volume) when the ringer is on, three long buzzes on vibrate,
+     * and nothing on silent.
+     */
+    static void playLowBattery(Context context) {
+        wakeFor(context, LOW_BATTERY_MILLIS + 1000);
+        AudioManager audio = context.getSystemService(AudioManager.class);
+        int mode = audio != null ? audio.getRingerMode() : AudioManager.RINGER_MODE_NORMAL;
+        if (mode == AudioManager.RINGER_MODE_VIBRATE) {
+            vibrate(context, LOW_BATTERY_VIBRATE_PATTERN);
+            return;
+        }
+        if (mode == AudioManager.RINGER_MODE_SILENT) {
+            return;
+        }
+        try {
+            ToneGenerator tone = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
+            tone.startTone(ToneGenerator.TONE_PROP_NACK, LOW_BATTERY_MILLIS);
+            MAIN.postDelayed(tone::release, LOW_BATTERY_MILLIS + 200);
+        } catch (RuntimeException ignored) {
+            // Audio unavailable right now (e.g. during a call); skip it.
+        }
+    }
+
+    private static void vibrate(Context context, long[] pattern) {
+        Vibrator vibrator;
+        if (Build.VERSION.SDK_INT >= 31) {
+            VibratorManager vm = context.getSystemService(VibratorManager.class);
+            vibrator = vm != null ? vm.getDefaultVibrator() : null;
+        } else {
+            vibrator = context.getSystemService(Vibrator.class);
+        }
+        if (vibrator == null || !vibrator.hasVibrator()) {
+            return;
+        }
+        // Notification usage, so the system's vibrate-on-vibrate-mode rules apply to it.
+        vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1),
+                new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .build());
     }
 
     /** The user's default alarm sound for {@link ChargeLogic#ALARM_PLAY_MILLIS}, on the alarm stream. */

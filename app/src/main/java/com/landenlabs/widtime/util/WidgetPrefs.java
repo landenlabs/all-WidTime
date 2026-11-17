@@ -34,6 +34,7 @@ public final class WidgetPrefs {
     private static final String KEY_CHARGE_ALERTS = "charge_alerts";
     private static final String KEY_SPEAK_STEP = "speak_step";
     private static final String KEY_BOOT_TONE = "boot_tone";
+    private static final String KEY_LOW_BATTERY_ALERT = "low_battery_alert";
 
     // Before per-city styles, one color/size/format applied to the whole widget. These keys are
     // only read now, as the style for cities saved without one.
@@ -170,6 +171,15 @@ public final class WidgetPrefs {
 
     public static void setBootTone(Context context, int widgetId, boolean enabled) {
         prefs(context, widgetId).edit().putBoolean(KEY_BOOT_TONE, enabled).apply();
+    }
+
+    /** Sound once when the battery drops below 20% (ChargeLogic.shouldAlertLowBattery); off by default. */
+    public static boolean getLowBatteryAlert(Context context, int widgetId) {
+        return prefs(context, widgetId).getBoolean(KEY_LOW_BATTERY_ALERT, false);
+    }
+
+    public static void setLowBatteryAlert(Context context, int widgetId, boolean enabled) {
+        prefs(context, widgetId).edit().putBoolean(KEY_LOW_BATTERY_ALERT, enabled).apply();
     }
 
     /** Copy of every stored value for this widget, for {@link #restore} (the settings screen's Undo). */

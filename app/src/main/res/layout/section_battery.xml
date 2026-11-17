@@ -39,5 +39,16 @@
         <TextView
             style="@style/HelpTextStyle"
             android:text="@string/battery_bar_help" />
+
+        <CheckBox
+            android:id="@+id/low_battery_alert"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/low_battery_alert_label" />
+
+        <TextView
+            style="@style/HelpTextStyle"
+            android:text="@string/low_battery_alert_help" />
     </LinearLayout>
 </LinearLayout>

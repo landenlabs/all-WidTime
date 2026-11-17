@@ -79,6 +79,7 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
     private TextView bgAlphaValue;
     private CheckBox showBatteryBar;
     private CheckBox showTimeLeftBar;
+    private CheckBox lowBatteryAlert;
     private CheckBox chargeAlerts;
     private Spinner speakStep;
     private CheckBox bootTone;
@@ -393,6 +394,18 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
                 saved();
             }
         });
+        lowBatteryAlert = findViewById(R.id.low_battery_alert);
+        lowBatteryAlert.setOnCheckedChangeListener((b, checked) -> {
+            if (binding) {
+                return;
+            }
+            // Started from this foreground screen, which Android 12+ requires for foreground services.
+            ChargeAlerts.setLowBatteryAlertEnabled(this, widgetId, checked);
+            if (checked) {
+                ChargeAlerts.previewLowBattery(this); // Let the user hear the alert and its volume.
+            }
+            saved();
+        });
     }
 
     private void setUpCharging() {
@@ -519,6 +532,7 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
 
             showBatteryBar.setChecked(WidgetPrefs.getShowBatteryBar(this, widgetId));
             showTimeLeftBar.setChecked(WidgetPrefs.getShowTimeLeftBar(this, widgetId));
+            lowBatteryAlert.setChecked(ChargeAlerts.isLowBatteryAlertEnabled(this, widgetId));
             chargeAlerts.setChecked(ChargeAlerts.isEnabled(this, widgetId));
             speakStep.setSelection(speakStepIndex(ChargeAlerts.getSpeakStep(this, widgetId)), false);
             bootTone.setChecked(BootTone.isEnabled(this, widgetId));

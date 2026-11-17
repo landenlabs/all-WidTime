@@ -86,6 +86,12 @@ sounds if the charger is unplugged.
 - A small foreground service watches the charger, because Android 8 and later deliver
   charger connect and disconnect events only to running apps. It restarts after a reboot.
 
+**Low battery alert** (optional, off by default; under **Battery**)
+- Sounds once when the battery drops below 20% while unplugged. It stays quiet until the
+  battery has been charged above 30%, then watches for the next drop below 20%. It follows the
+  notification volume, vibrates instead when the phone is on vibrate, and stays quiet on
+  silent. It uses the same small foreground service as the charging alerts.
+
 **Boot chime** (optional, off by default; under **Charging**)
 - After a restart, plays a short chime once the phone reaches the lock screen and is ready to
   use. It follows the notification volume, so it is silent on vibrate or silent.
