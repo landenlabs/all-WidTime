@@ -60,6 +60,17 @@
             style="@style/HelpTextStyle"
             android:text="@string/speak_help" />
 
+        <CheckBox
+            android:id="@+id/boot_tone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/boot_tone_label" />
+
+        <TextView
+            style="@style/HelpTextStyle"
+            android:text="@string/boot_tone_help" />
+
         <!-- Shown only while charging alerts are on and exact alarms are not allowed. -->
         <LinearLayout
             android:id="@+id/exact_alarm_row"

@@ -36,6 +36,8 @@
     <string name="speak_charged">Charged to %1$d percent</string>
     <string name="speak_test">Voice test. Charged to %1$d percent</string>
     <string name="speak_full">Fully charged</string>
+    <string name="boot_tone_label">Chime when the phone has started</string>
+    <string name="boot_tone_help">After a restart, plays a short chime once the phone reaches the lock screen and is ready to use. Uses the notification volume, so it is silent on vibrate or silent. Set per widget: plays once if any widget has it on.</string>
     <string name="channel_monitor">Charger monitor</string>
     <string name="channel_alarm">Charger disconnected alarm</string>
     <string name="monitor_notification_title">Watching charger</string>

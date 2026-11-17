@@ -201,6 +201,7 @@ public final class ChargeAlerts {
      * updates) are covered by starts from the settings screen, boot, and app update.
      */
     public static void syncService(Context context) {
+        BootTone.sync(context); // Same triggers keep the boot chime's direct-boot copy current.
         Intent service = new Intent(context, ChargeMonitorService.class);
         boolean widgets = hasWidgets(context);
         boolean alerts = isEnabled(context) && widgets;

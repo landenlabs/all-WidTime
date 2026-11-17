@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.landenlabs.widtime.R;
+import com.landenlabs.widtime.alerts.BootTone;
 import com.landenlabs.widtime.alerts.ChargeAlerts;
 import com.landenlabs.widtime.model.CityEntry;
 import com.landenlabs.widtime.util.ChargeLogic;
@@ -80,6 +81,7 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
     private CheckBox showTimeLeftBar;
     private CheckBox chargeAlerts;
     private Spinner speakStep;
+    private CheckBox bootTone;
     private View exactAlarmRow;
     private View undoButton;
 
@@ -414,6 +416,17 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
         });
         findViewById(R.id.exact_alarm_button).setOnClickListener(v -> requestExactAlarms());
         setUpSpeakStep();
+        bootTone = findViewById(R.id.boot_tone);
+        bootTone.setOnCheckedChangeListener((b, checked) -> {
+            if (binding) {
+                return;
+            }
+            BootTone.setEnabled(this, widgetId, checked);
+            if (checked) {
+                BootTone.preview(this); // Let the user hear the chime and its volume.
+            }
+            saved();
+        });
     }
 
     /** "Speak battery %": Off / Every 5% / 10% / 20% / 25% (ChargeLogic.SPEAK_STEPS). */
@@ -508,6 +521,7 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
             showTimeLeftBar.setChecked(WidgetPrefs.getShowTimeLeftBar(this, widgetId));
             chargeAlerts.setChecked(ChargeAlerts.isEnabled(this, widgetId));
             speakStep.setSelection(speakStepIndex(ChargeAlerts.getSpeakStep(this, widgetId)), false);
+            bootTone.setChecked(BootTone.isEnabled(this, widgetId));
             updateExactAlarmRow();
         } finally {
             binding = false;

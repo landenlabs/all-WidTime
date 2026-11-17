@@ -86,6 +86,10 @@ sounds if the charger is unplugged.
 - A small foreground service watches the charger, because Android 8 and later deliver
   charger connect and disconnect events only to running apps. It restarts after a reboot.
 
+**Boot chime** (optional, off by default; under **Charging**)
+- After a restart, plays a short chime once the phone reaches the lock screen and is ready to
+  use. It follows the notification volume, so it is silent on vibrate or silent.
+
 ---
 
 ### Requirements

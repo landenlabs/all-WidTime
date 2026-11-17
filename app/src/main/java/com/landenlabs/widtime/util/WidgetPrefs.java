@@ -33,6 +33,7 @@ public final class WidgetPrefs {
     private static final String KEY_SHOW_TIME_LEFT_BAR = "show_time_left_bar";
     private static final String KEY_CHARGE_ALERTS = "charge_alerts";
     private static final String KEY_SPEAK_STEP = "speak_step";
+    private static final String KEY_BOOT_TONE = "boot_tone";
 
     // Before per-city styles, one color/size/format applied to the whole widget. These keys are
     // only read now, as the style for cities saved without one.
@@ -160,6 +161,15 @@ public final class WidgetPrefs {
 
     public static void setSpeakStep(Context context, int widgetId, int step) {
         prefs(context, widgetId).edit().putInt(KEY_SPEAK_STEP, Math.max(step, 0)).apply();
+    }
+
+    /** Chime once the phone has restarted (BootTone); off by default. */
+    public static boolean getBootTone(Context context, int widgetId) {
+        return prefs(context, widgetId).getBoolean(KEY_BOOT_TONE, false);
+    }
+
+    public static void setBootTone(Context context, int widgetId, boolean enabled) {
+        prefs(context, widgetId).edit().putBoolean(KEY_BOOT_TONE, enabled).apply();
     }
 
     /** Copy of every stored value for this widget, for {@link #restore} (the settings screen's Undo). */

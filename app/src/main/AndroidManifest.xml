@@ -51,6 +51,17 @@
             </intent-filter>
         </receiver>
 
+        <!-- Optional "phone is ready" chime. Direct-boot aware so it runs at the lock screen,
+             before the first unlock; it reads only device-protected storage. -->
+        <receiver
+            android:name=".alerts.BootTone"
+            android:directBootAware="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".widget.CityRemoteViewsService"
             android:exported="false"
