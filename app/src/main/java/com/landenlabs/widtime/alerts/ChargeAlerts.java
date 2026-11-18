@@ -16,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
@@ -300,13 +301,30 @@ public final class ChargeAlerts {
         // The mute and the 100% notice only cover the charge that just ended.
         prefs(context).edit().putBoolean(KEY_SESSION, false).putBoolean(KEY_MUTED, false)
                 .putBoolean(KEY_FULL_DONE, false).apply();
-        if (isEnabled(context) && !muted && !fullDone) {
+        // Unplugging mid-call (e.g. to walk away with the phone) is deliberate: no alarm.
+        if (isEnabled(context) && !muted && !fullDone && !isInCall(context)) {
             prefs(context).edit().putBoolean(KEY_ALARM, true).apply();
             SoundPlayer.playAlarm(context);
             scheduleNextAlarm(context);
             showAlarmNotification(context);
         }
         TimeWidgetProvider.refreshAll(context);
+    }
+
+    /**
+     * True during a phone or VoIP call. Uses the audio mode, which needs no phone-state permission;
+     * MODE_CALL_SCREENING (API 30+) is a call being answered by call screening.
+     */
+    static boolean isInCall(Context context) {
+        AudioManager audio = context.getSystemService(AudioManager.class);
+        if (audio == null) {
+            return false;
+        }
+        int mode = audio.getMode();
+        return mode == AudioManager.MODE_IN_CALL
+                || mode == AudioManager.MODE_IN_COMMUNICATION
+                || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                        && mode == AudioManager.MODE_CALL_SCREENING);
     }
 
     static void onPingDue(Context context) {
