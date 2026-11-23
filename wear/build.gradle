@@ -1,0 +1,72 @@
+// Wear OS companion (Galaxy Watch4 and newer): reports the watch's battery level and charging
+// state to the phone app over the Wearable Data Layer. The Data Layer only connects apps with
+// the same applicationId signed with the same key, so both match the phone app (:app).
+plugins {
+    id 'com.android.application'
+}
+
+// The watch app's version follows the phone app's. Play needs a unique versionCode for every
+// artifact in one listing, so the watch's is offset (phone 61114 -> watch 1000061114).
+evaluationDependsOn(':app')
+def phoneConfig = project(':app').android.defaultConfig
+
+android {
+    namespace = 'com.landenlabs.widtime.wear'
+    compileSdk = 37
+
+    defaultConfig {
+        applicationId = "com.landenlabs.widtime"
+        minSdk = 30         // Wear OS 3, the first version on Galaxy Watch (Watch4).
+        targetSdk = 36
+        versionCode = 1_000_000_000 + phoneConfig.versionCode
+        versionName = phoneConfig.versionName
+    }
+
+    // Same opt-in release signing as :app (environment variables, else local.properties).
+    def localProps = new Properties()
+    def localPropsFile = rootProject.file('local.properties')
+    if (localPropsFile.exists()) {
+        localPropsFile.withInputStream { localProps.load(it) }
+    }
+    def signingValue = { String envName, String propName ->
+        System.getenv(envName) ?: localProps.getProperty(propName)
+    }
+    def releaseStoreFile = signingValue('CI_KEYSTORE_PATH', 'release.storeFile')
+
+    signingConfigs {
+        release {
+            if (releaseStoreFile) {
+                // local.properties paths are relative to app/, so resolve them from there.
+                storeFile project(':app').file(releaseStoreFile)
+                storePassword signingValue('CI_KEYSTORE_PASSWORD', 'release.storePassword')
+                keyAlias signingValue('CI_KEY_ALIAS', 'release.keyAlias')
+                keyPassword signingValue('CI_KEY_PASSWORD', 'release.keyPassword')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            if (releaseStoreFile) {
+                signingConfig = signingConfigs.release
+            }
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+}
+
+// e.g. WidTime-Wear-6.11.14-release.apk
+base {
+    archivesName = "WidTime-Wear-${android.defaultConfig.versionName}"
+}
+
+dependencies {
+    implementation 'com.google.android.gms:play-services-wearable:20.0.1'
+}

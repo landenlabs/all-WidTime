@@ -71,6 +71,37 @@
             style="@style/HelpTextStyle"
             android:text="@string/boot_tone_help" />
 
+        <View style="@style/SectionDividerStyle" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/watch_heading"
+            android:textStyle="bold" />
+
+        <CheckBox
+            android:id="@+id/show_watch_battery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/show_watch_battery_label" />
+
+        <CheckBox
+            android:id="@+id/watch_full_alert"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/watch_full_alert_label" />
+
+        <TextView
+            style="@style/HelpTextStyle"
+            android:text="@string/watch_help" />
+
+        <!-- Latest watch reading, or what's missing (no watch app, no Wear OS connection). -->
+        <TextView
+            android:id="@+id/watch_status_text"
+            style="@style/HelpTextStyle"
+            android:layout_marginTop="8dp"
+            android:textColor="?android:attr/textColorPrimary" />
+
         <!-- Shown only while charging alerts are on and exact alarms are not allowed. -->
         <LinearLayout
             android:id="@+id/exact_alarm_row"

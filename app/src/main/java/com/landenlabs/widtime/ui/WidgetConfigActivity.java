@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.text.format.DateUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -45,6 +46,7 @@ import com.landenlabs.widtime.model.CityEntry;
 import com.landenlabs.widtime.util.ChargeLogic;
 import com.landenlabs.widtime.util.ListMoves;
 import com.landenlabs.widtime.util.WidgetPrefs;
+import com.landenlabs.widtime.watch.WatchBattery;
 import com.landenlabs.widtime.widget.TimeWidgetProvider;
 
 import java.util.ArrayList;
@@ -84,6 +86,9 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
     private Spinner speakStep;
     private CheckBox bootTone;
     private View exactAlarmRow;
+    private CheckBox showWatchBattery;
+    private CheckBox watchFullAlert;
+    private TextView watchStatusText;
     private View undoButton;
 
     private int backgroundColor;
@@ -99,6 +104,7 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
         @Override
         public void run() {
             adapter.refreshTimes();
+            updateWatchStatus();
             handler.postDelayed(this, TIME_REFRESH_MILLIS);
         }
     };
@@ -193,6 +199,9 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
         super.onResume();
         // The user may be returning from the "Alarms & reminders" settings page.
         updateExactAlarmRow();
+        if (showWatchBattery.isChecked() || watchFullAlert.isChecked()) {
+            WatchBattery.requestRefresh(this); // The reading arrives via WatchBatteryListener.
+        }
         handler.post(timeTick);
     }
 
@@ -440,6 +449,66 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
             }
             saved();
         });
+        setUpWatch();
+    }
+
+    /** Galaxy Watch battery line and "fully charged" notice, fed by the WidTime watch app. */
+    private void setUpWatch() {
+        showWatchBattery = findViewById(R.id.show_watch_battery);
+        watchFullAlert = findViewById(R.id.watch_full_alert);
+        watchStatusText = findViewById(R.id.watch_status_text);
+        showWatchBattery.setOnCheckedChangeListener((b, checked) -> {
+            if (binding) {
+                return;
+            }
+            WidgetPrefs.setShowWatchBattery(this, widgetId, checked);
+            watchSettingChanged(checked);
+        });
+        watchFullAlert.setOnCheckedChangeListener((b, checked) -> {
+            if (binding) {
+                return;
+            }
+            WidgetPrefs.setWatchFullAlert(this, widgetId, checked);
+            if (checked && Build.VERSION.SDK_INT >= 33
+                    && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+            watchSettingChanged(checked);
+        });
+    }
+
+    private void watchSettingChanged(boolean checked) {
+        if (checked) {
+            WatchBattery.requestRefresh(this);
+        }
+        updateWatchStatus();
+        saved();
+    }
+
+    /** The latest watch reading, or what's missing; refreshed with the clock tick. */
+    private void updateWatchStatus() {
+        if (watchStatusText == null) {
+            return;
+        }
+        WatchBattery.State watch = WatchBattery.get(this);
+        if (watch.isKnown()) {
+            int state = watch.full ? R.string.watch_state_full
+                    : watch.charging ? R.string.watch_state_charging : R.string.watch_state_battery;
+            CharSequence ago = DateUtils.getRelativeTimeSpanString(
+                    Math.min(watch.timeMillis, System.currentTimeMillis()),
+                    System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS);
+            watchStatusText.setText(getString(watch.isFresh()
+                    ? R.string.watch_status_reading : R.string.watch_status_stale,
+                    getString(state, watch.level), ago));
+            return;
+        }
+        WatchBattery.findWatchApp(this, installed -> {
+            if (isFinishing() || WatchBattery.get(this).isKnown()) {
+                return;
+            }
+            watchStatusText.setText(installed == null ? R.string.watch_status_no_wear
+                    : installed ? R.string.watch_status_waiting : R.string.watch_status_not_installed);
+        });
     }
 
     /** "Speak battery %": Off / Every 5% / 10% / 20% / 25% (ChargeLogic.SPEAK_STEPS). */
@@ -536,6 +605,9 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
             chargeAlerts.setChecked(ChargeAlerts.isEnabled(this, widgetId));
             speakStep.setSelection(speakStepIndex(ChargeAlerts.getSpeakStep(this, widgetId)), false);
             bootTone.setChecked(BootTone.isEnabled(this, widgetId));
+            showWatchBattery.setChecked(WidgetPrefs.getShowWatchBattery(this, widgetId));
+            watchFullAlert.setChecked(WidgetPrefs.getWatchFullAlert(this, widgetId));
+            updateWatchStatus();
             updateExactAlarmRow();
         } finally {
             binding = false;

@@ -40,6 +40,24 @@
     <string name="low_battery_alert_help">Sounds once when the battery drops below 20% while unplugged. It won\'t sound again until the battery has been charged above 30%. Uses the notification volume; vibrates instead when the phone is on vibrate, and stays quiet on silent. Set per widget: sounds once if any widget has it on.</string>
     <string name="boot_tone_label">Chime when the phone has started</string>
     <string name="boot_tone_help">After a restart, plays a short chime once the phone reaches the lock screen and is ready to use. Uses the notification volume, so it is silent on vibrate or silent. Set per widget: plays once if any widget has it on.</string>
+    <string name="watch_heading">Galaxy Watch</string>
+    <string name="show_watch_battery_label">Show watch battery on the widget</string>
+    <string name="watch_full_alert_label">Notify when the watch is fully charged</string>
+    <string name="watch_help">Needs the WidTime Watch app on a Wear OS watch (Galaxy Watch4 or newer): install it from the Play Store on the watch and open it once. The watch sends its battery level when it is put on or taken off its charger, every few minutes while charging, and about every 30 minutes otherwise. The widget line is hidden when the last reading is old (watch out of range). The full notice plays once per charge and uses the notification sound. Set per widget: the notice is given once if any widget has it on.</string>
+    <string name="watch_status_reading">Watch: %1$s, %2$s</string>
+    <string name="watch_status_stale">Last watch reading: %1$s, %2$s (old)</string>
+    <string name="watch_status_waiting">WidTime Watch found. Waiting for its first reading; open it on the watch if this stays.</string>
+    <string name="watch_status_not_installed">WidTime Watch isn\'t on a paired watch yet. Install it from the Play Store on the watch, then open it once.</string>
+    <string name="watch_status_no_wear">No Wear OS watch connection. Pair the watch with the Galaxy Wearable app.</string>
+    <string name="watch_widget_charging">⌚ %1$d%% ⚡ Charging</string>
+    <string name="watch_widget_full">⌚ %1$d%% ⚡ Fully charged</string>
+    <string name="watch_widget_battery">⌚ %1$d%%</string>
+    <string name="watch_state_charging">%1$d%% charging</string>
+    <string name="watch_state_full">%1$d%% fully charged</string>
+    <string name="watch_state_battery">%1$d%% on battery</string>
+    <string name="channel_watch">Watch charging</string>
+    <string name="watch_full_title">Watch fully charged</string>
+    <string name="watch_full_text">Your watch is at %1$d%%. You can take it off the charger.</string>
     <string name="channel_monitor">Charger monitor</string>
     <string name="channel_alarm">Charger disconnected alarm</string>
     <string name="monitor_notification_title">Watching charger</string>
@@ -120,8 +138,8 @@
     <string name="privacy_text"><![CDATA[
 <p>All World Time is published by LanDen Labs. It has no account, shows no ads and does not sell or share data.</p>
 <p><b>City search is the only network use.</b> When you type in Add city, the city name you type (the part before any comma) is sent to the free Open-Meteo geocoding service (open-meteo.com) to find matching cities and their time zones. Like any web request, Open-Meteo sees your IP address. Nothing else is sent: no location, settings, battery data or identifiers. The app contains no analytics, crash reporting or advertising code, and we never receive any of your data.</p>
-<p><b>Stored only on your phone:</b> the cities, colors, sizes and formats you choose for each widget; recent battery readings used to estimate the time left; and whether charging alerts are on. Android backup, if you turn it on, may back these settings up to your Google account.</p>
-<p><b>Permissions:</b> Internet (city search only), notifications (the unplug alarm and the “Watching charger” notice), a foreground service (to notice the charger being connected or unplugged), exact alarms (to play pings and the alarm on time), full-screen alarm, wake lock (while a sound plays) and run at startup. The app does not use location, camera, microphone, contacts, photos or storage.</p>
+<p><b>Stored only on your phone:</b> the cities, colors, sizes and formats you choose for each widget; recent battery readings used to estimate the time left; whether charging alerts are on; and, if you use the WidTime Watch app, your watch\'s latest battery level and charging state. The watch sends these directly to your phone through Google Play services (the Wear OS Data Layer); we never receive them. Android backup, if you turn it on, may back these settings up to your Google account.</p>
+<p><b>Permissions:</b> Internet (city search only), notifications (the unplug alarm and the “Watching charger” notice), a foreground service (to notice the charger being connected or unplugged), exact alarms (to play pings and the alarm on time), full-screen alarm, wake lock (while a sound plays) and run at startup. The watch app only needs run at startup. The app does not use location, camera, microphone, contacts, photos or storage.</p>
 <p><b>Deleting data:</b> removing a widget deletes its settings. Uninstalling the app or clearing its storage deletes everything.</p>
 <p>Questions: landenlabs.app@gmail.com</p>
 ]]></string>

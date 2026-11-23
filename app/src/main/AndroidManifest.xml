@@ -109,6 +109,19 @@
             android:taskAffinity=""
             android:theme="@style/Theme.WidTime.Config" />
 
+        <!-- Battery readings from the WidTime watch app, delivered by Google Play services. -->
+        <service
+            android:name=".watch.WatchBatteryListener"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <data
+                    android:host="*"
+                    android:path="/widtime/watch_battery"
+                    android:scheme="wear" />
+            </intent-filter>
+        </service>
+
         <activity
             android:name=".ui.AddCityActivity"
             android:exported="false"

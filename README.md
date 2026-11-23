@@ -92,6 +92,17 @@ sounds if the charger is unplugged.
   notification volume, vibrates instead when the phone is on vibrate, and stays quiet on
   silent. It uses the same small foreground service as the charging alerts.
 
+**Galaxy Watch charging** (optional, off by default; under **Charging**)
+- Needs the companion **WidTime Watch** app (module `wear`) on a Wear OS watch: Galaxy Watch4
+  or newer. Install it on the watch from the Play Store and open it once.
+- **Show watch battery on the widget** adds a line such as `⌚ 45% ⚡ Charging` under the clocks.
+  It is hidden once the last reading is old (15 minutes while charging, 3 hours otherwise).
+- **Notify when the watch is fully charged** posts one notification per charge, using the
+  notification sound. It clears when the watch comes off the charger.
+- The watch runs no background service. A "requires charging" job wakes it when it goes on the
+  charger, an alarm re-checks every minute while it charges, and a 30 minute job reports the
+  level otherwise. Readings go straight to the phone over the Wear OS Data Layer.
+
 **Boot chime** (optional, off by default; under **Charging**)
 - After a restart, plays a short chime once the phone reaches the lock screen and is ready to
   use. It follows the notification volume, so it is silent on vibrate or silent.
@@ -124,12 +135,19 @@ sounds if the charger is unplugged.
 ./gradlew assembleDebug
 ```
 
-Outputs are named after the version, for example `WidTime-1.0-debug.apk`. The Play Store bundle
+Outputs are named after the version, for example `WidTime-1.0-debug.apk`. The watch app builds
+alongside it as `wear/build/outputs/apk/debug/WidTime-Wear-1.0-debug.apk`. It has the same
+application ID and must be signed with the same key as the phone app, or the two can't talk.
+Its versionCode is the phone's plus 1,000,000,000, so both can go in one Play listing. The Play Store bundle
 (R8 shrinks and obfuscates release builds) is built with:
 
 ```
 ./gradlew bundleRelease
 ```
+
+This builds `app/build/outputs/bundle/release/` (phone) and `wear/build/outputs/bundle/release/`
+(watch). Upload the watch bundle to the listing's Wear OS release track; the Wear OS form
+factor has to be added under **Advanced settings > Form factors** first.
 
 Unit tests for the charging, battery estimate and widget mode logic run with:
 

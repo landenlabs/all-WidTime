@@ -28,6 +28,7 @@ import com.landenlabs.widtime.util.ChargingInfo;
 import com.landenlabs.widtime.util.DischargeEstimator;
 import com.landenlabs.widtime.util.WidgetMode;
 import com.landenlabs.widtime.util.WidgetPrefs;
+import com.landenlabs.widtime.watch.WatchBattery;
 
 import java.util.List;
 import java.util.Locale;
@@ -159,6 +160,7 @@ public class TimeWidgetProvider extends AppWidgetProvider {
         CityEntry style = visible.isEmpty() ? WidgetPrefs.defaultStyle(context, widgetId) : visible.get(0);
         int color = style.textColor;
         float size = style.textSizeSp;
+        applyWatchStatus(context, views, widgetId, color, size);
         if (showCharging) {
             views.setTextViewText(R.id.charging_headline, context.getString(
                     charging.full ? R.string.charged_headline : R.string.charging_headline,
@@ -177,6 +179,21 @@ public class TimeWidgetProvider extends AppWidgetProvider {
             views.setTextViewTextSize(R.id.alarm_headline, TypedValue.COMPLEX_UNIT_SP, size);
             styleText(views, R.id.alarm_detail, color, size * 0.8f);
         }
+    }
+
+    /** "⌚ 45% ⚡ Charging" under the clocks, while the watch's last reading is recent. */
+    private static void applyWatchStatus(Context context, RemoteViews views, int widgetId,
+                                         int color, float textSizeSp) {
+        WatchBattery.State watch = WatchBattery.get(context);
+        boolean show = WidgetPrefs.getShowWatchBattery(context, widgetId) && watch.isFresh();
+        views.setViewVisibility(R.id.watch_status, show ? View.VISIBLE : View.GONE);
+        if (!show) {
+            return;
+        }
+        int text = watch.full ? R.string.watch_widget_full
+                : watch.charging ? R.string.watch_widget_charging : R.string.watch_widget_battery;
+        views.setTextViewText(R.id.watch_status, context.getString(text, watch.level));
+        styleText(views, R.id.watch_status, color, textSizeSp * 0.8f);
     }
 
     /** e.g. "Fast · AC · 1.85 A"; parts the device doesn't report are left out. */

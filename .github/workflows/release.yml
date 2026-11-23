@@ -40,10 +40,13 @@ jobs:
           CI_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew assembleRelease --no-daemon
 
-      # APK is named via archivesName, e.g. WidTime-6.11.14-release.apk
+      # APKs are named via archivesName, e.g. WidTime-6.11.14-release.apk (phone) and
+      # WidTime-Wear-6.11.14-release.apk (watch); assembleRelease builds both modules.
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           fail_on_unmatched_files: true
-          files: app/build/outputs/apk/release/*.apk
+          files: |
+            app/build/outputs/apk/release/*.apk
+            wear/build/outputs/apk/release/*.apk

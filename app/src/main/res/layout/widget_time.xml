@@ -121,6 +121,17 @@
             </LinearLayout>
         </FrameLayout>
 
+        <!-- Paired watch's battery (WatchBattery), when this widget shows it and the reading is recent. -->
+        <TextView
+            android:id="@+id/watch_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:paddingBottom="2dp"
+            android:singleLine="true"
+            android:visibility="gone" />
+
         <ImageView
             android:id="@+id/time_left_bar"
             style="@style/BatteryBarStyle"

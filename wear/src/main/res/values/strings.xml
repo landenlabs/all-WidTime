@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">WidTime Watch</string>
+    <string name="status_charging">⚡ %1$d%%\nCharging</string>
+    <string name="status_full">%1$d%%\nFully charged</string>
+    <string name="status_battery">%1$d%%\nOn battery</string>
+    <string name="status_footer">Sending battery and charging to WidTime on your phone.</string>
+</resources>

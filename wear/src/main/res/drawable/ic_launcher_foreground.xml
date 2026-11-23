@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Launcher foreground: clock inside a battery-charge ring, with a charging bolt.
+     Source and Play Store copy: play-store/icon.svg. Kept inside the 66dp adaptive-icon safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Ring track (uncharged part). -->
+    <path
+        android:strokeColor="#3A4A5C"
+        android:strokeWidth="7"
+        android:pathData="M54,31 A23,23 0 1,1 54,77 A23,23 0 1,1 54,31 Z" />
+    <!-- Charge arc, 3/4 full. -->
+    <path
+        android:strokeColor="#81C784"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:pathData="M54,31 A23,23 0 1,1 31,54" />
+    <!-- Clock hands. -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M54,42 V54 L63,59" />
+    <!-- Bolt, with a background-coloured outline so it separates from the ring. -->
+    <group
+        android:translateX="39"
+        android:translateY="40"
+        android:scaleX="1.4"
+        android:scaleY="1.4">
+        <path
+            android:fillColor="#1E2A38"
+            android:strokeColor="#1E2A38"
+            android:strokeWidth="3"
+            android:strokeLineJoin="round"
+            android:pathData="M2,-12 L-7,2 L-1,2 L-3,12 L7,-2 L1,-2 Z" />
+        <path
+            android:fillColor="#FFD54F"
+            android:pathData="M2,-12 L-7,2 L-1,2 L-3,12 L7,-2 L1,-2 Z" />
+    </group>
+</vector>

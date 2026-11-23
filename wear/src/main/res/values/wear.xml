@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Lets the phone app find watches with this app installed (CapabilityClient). Must match
+     WatchProtocol.CAPABILITY in both modules. Kept from resource shrinking by res/raw/keep.xml. -->
+<resources>
+    <string-array name="android_wear_capabilities" translatable="false">
+        <item>widtime_watch_battery</item>
+    </string-array>
+</resources>
