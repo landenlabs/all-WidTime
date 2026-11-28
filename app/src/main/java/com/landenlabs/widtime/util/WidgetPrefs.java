@@ -31,6 +31,7 @@ public final class WidgetPrefs {
     private static final String KEY_BACKGROUND_COLOR = "background_color";
     private static final String KEY_SHOW_BATTERY_BAR = "show_battery_bar";
     private static final String KEY_SHOW_TIME_LEFT_BAR = "show_time_left_bar";
+    private static final String KEY_SHOW_TEMP_BAR = "show_temp_bar";
     private static final String KEY_CHARGE_ALERTS = "charge_alerts";
     private static final String KEY_SPEAK_STEP = "speak_step";
     private static final String KEY_BOOT_TONE = "boot_tone";
@@ -137,12 +138,35 @@ public final class WidgetPrefs {
         prefs(context, widgetId).edit().putBoolean(KEY_SHOW_BATTERY_BAR, show).apply();
     }
 
+    /** Time-left bottom bar; never on together with the temperature bar (temperature wins). */
     public static boolean getShowTimeLeftBar(Context context, int widgetId) {
-        return prefs(context, widgetId).getBoolean(KEY_SHOW_TIME_LEFT_BAR, false);
+        return prefs(context, widgetId).getBoolean(KEY_SHOW_TIME_LEFT_BAR, false)
+                && !getShowTempBar(context, widgetId);
     }
 
+    /** Turning the time-left bar on turns the temperature bar off: both use the bottom slot. */
     public static void setShowTimeLeftBar(Context context, int widgetId, boolean show) {
-        prefs(context, widgetId).edit().putBoolean(KEY_SHOW_TIME_LEFT_BAR, show).apply();
+        SharedPreferences.Editor editor = prefs(context, widgetId).edit()
+                .putBoolean(KEY_SHOW_TIME_LEFT_BAR, show);
+        if (show) {
+            editor.putBoolean(KEY_SHOW_TEMP_BAR, false);
+        }
+        editor.apply();
+    }
+
+    /** Battery temperature bar (bottom, or a big bar when no cities are shown); off by default. */
+    public static boolean getShowTempBar(Context context, int widgetId) {
+        return prefs(context, widgetId).getBoolean(KEY_SHOW_TEMP_BAR, false);
+    }
+
+    /** Turning the temperature bar on turns the time-left bar off: both use the bottom slot. */
+    public static void setShowTempBar(Context context, int widgetId, boolean show) {
+        SharedPreferences.Editor editor = prefs(context, widgetId).edit()
+                .putBoolean(KEY_SHOW_TEMP_BAR, show);
+        if (show) {
+            editor.putBoolean(KEY_SHOW_TIME_LEFT_BAR, false);
+        }
+        editor.apply();
     }
 
     /**

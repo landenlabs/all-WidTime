@@ -136,20 +136,32 @@
             android:id="@+id/time_left_bar"
             style="@style/BatteryBarStyle"
             android:contentDescription="@string/time_left_bar_label" />
+
+        <!-- Same bottom slot as time left; the two are never on together (temperature wins). -->
+        <ImageView
+            android:id="@+id/temp_bar"
+            style="@style/BatteryBarStyle"
+            android:contentDescription="@string/temp_bar_label" />
     </LinearLayout>
 
-    <!-- Battery-only mode (no cities, only the level bar on): one large bar, 80% of the widget
-         each way (10% border), with the percent centered over it. Taps fall through to widget_root. -->
+    <!-- Big-bar mode (no cities, no time-left bar; level and/or temperature bar on). One bar is
+         80% of the widget each way (10% border); two split that height. Text is centered over
+         each bar. Spacer weights are 1 + 8 (+ 8) + 1. Taps fall through to widget_root. -->
     <LinearLayout
         android:id="@+id/big_battery_panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
         android:orientation="vertical"
-        android:visibility="gone"
-        android:weightSum="10">
+        android:visibility="gone">
+
+        <!-- Spacer (FrameLayout: android.widget.Space is not allowed in RemoteViews). -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <LinearLayout
+            android:id="@+id/big_battery_row"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="8"
@@ -164,31 +176,43 @@
 
                 <ImageView
                     android:id="@+id/big_battery_bar"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/battery_track_textured"
-                    android:importantForAccessibility="no"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/battery_bar_fill" />
+                    style="@style/BigBarStyle" />
 
                 <TextView
                     android:id="@+id/big_battery_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:autoSizeMaxTextSize="200sp"
-                    android:autoSizeMinTextSize="8sp"
-                    android:autoSizeTextType="uniform"
-                    android:gravity="center"
-                    android:maxLines="1"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:shadowColor="#CC000000"
-                    android:shadowDx="0"
-                    android:shadowDy="1"
-                    android:shadowRadius="4"
-                    android:textColor="#FFFFFFFF"
-                    android:textStyle="bold" />
+                    style="@style/BigBarTextStyle" />
             </FrameLayout>
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/big_temp_row"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="4dp"
+            android:layout_weight="8"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="8">
+
+                <ImageView
+                    android:id="@+id/big_temp_bar"
+                    style="@style/BigBarStyle" />
+
+                <TextView
+                    android:id="@+id/big_temp_text"
+                    style="@style/BigBarTextStyle" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- Spacer (FrameLayout: android.widget.Space is not allowed in RemoteViews). -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
     </LinearLayout>
 </FrameLayout>

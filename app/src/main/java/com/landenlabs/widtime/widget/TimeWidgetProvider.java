@@ -23,6 +23,7 @@ import com.landenlabs.widtime.alerts.ChargeAlerts;
 import com.landenlabs.widtime.model.CityEntry;
 import com.landenlabs.widtime.ui.WidgetConfigActivity;
 import com.landenlabs.widtime.util.BatteryStatus;
+import com.landenlabs.widtime.util.BatteryTemp;
 import com.landenlabs.widtime.util.ChargeLogic;
 import com.landenlabs.widtime.util.ChargingInfo;
 import com.landenlabs.widtime.util.DischargeEstimator;
@@ -137,14 +138,24 @@ public class TimeWidgetProvider extends AppWidgetProvider {
                                           BatteryStatus status, ChargingInfo charging, boolean alarm) {
         List<CityEntry> visible = WidgetPrefs.getVisibleCities(context, widgetId);
 
-        // Battery-only mode replaces the whole widget, charging or not; only the unplug alarm wins.
-        boolean batteryOnly = !alarm && WidgetMode.isBatteryOnly(visible.size(),
+        // Big-bar mode replaces the whole widget, charging or not; only the unplug alarm wins.
+        WidgetMode.BigBars big = alarm ? WidgetMode.BigBars.NONE : WidgetMode.bigBars(visible.size(),
                 WidgetPrefs.getShowBatteryBar(context, widgetId),
-                WidgetPrefs.getShowTimeLeftBar(context, widgetId), status.levelPercent);
-        views.setViewVisibility(R.id.big_battery_panel, batteryOnly ? View.VISIBLE : View.GONE);
-        views.setViewVisibility(R.id.widget_content, batteryOnly ? View.GONE : View.VISIBLE);
-        if (batteryOnly) {
-            applyBigBatteryBar(context, views, status.levelPercent, charging.plugged);
+                WidgetPrefs.getShowTimeLeftBar(context, widgetId),
+                WidgetPrefs.getShowTempBar(context, widgetId),
+                status.levelPercent, status.temperatureC);
+        boolean bigMode = big != WidgetMode.BigBars.NONE;
+        views.setViewVisibility(R.id.big_battery_panel, bigMode ? View.VISIBLE : View.GONE);
+        views.setViewVisibility(R.id.widget_content, bigMode ? View.GONE : View.VISIBLE);
+        if (bigMode) {
+            views.setViewVisibility(R.id.big_battery_row, big.showBattery() ? View.VISIBLE : View.GONE);
+            views.setViewVisibility(R.id.big_temp_row, big.showTemperature() ? View.VISIBLE : View.GONE);
+            if (big.showBattery()) {
+                applyBigBatteryBar(context, views, status.levelPercent, charging.plugged);
+            }
+            if (big.showTemperature()) {
+                applyBigTempBar(context, views, status.temperatureC);
+            }
             return;
         }
 
@@ -262,9 +273,19 @@ public class TimeWidgetProvider extends AppWidgetProvider {
                     ? 0 : DischargeEstimator.percentOfFullScale(status.hoursLeft);
             setBar(views, R.id.time_left_bar, percent);
         }
+
+        // Unknown temperature: hide the bar (unlike time left, it never fills in later).
+        boolean showTemp = WidgetPrefs.getShowTempBar(context, widgetId) && !Double.isNaN(status.temperatureC);
+        views.setViewVisibility(R.id.temp_bar, showTemp ? View.VISIBLE : View.GONE);
+        if (showTemp) {
+            setBar(views, R.id.temp_bar, BatteryTemp.percentOfScale(status.temperatureC),
+                    BatteryTemp.colorFor(status.temperatureC));
+            views.setContentDescription(R.id.temp_bar, context.getString(R.string.big_temp_desc,
+                    formatTemp(status.temperatureC)));
+        }
     }
 
-    /** The battery-only bar: level fill and centered percent; brighter fill and a bolt while plugged. */
+    /** The big level bar: level fill and centered percent; brighter fill and a bolt while plugged. */
     private static void applyBigBatteryBar(Context context, RemoteViews views, int levelPercent,
                                            boolean plugged) {
         int color = DischargeEstimator.colorForPercent(levelPercent);
@@ -279,9 +300,25 @@ public class TimeWidgetProvider extends AppWidgetProvider {
                 plugged ? R.string.big_battery_desc_charging : R.string.big_battery_desc, levelPercent));
     }
 
+    /** The temperature big bar: fill from 20 °C (empty) to 60 °C (full), temperature centered. */
+    private static void applyBigTempBar(Context context, RemoteViews views, double celsius) {
+        setBar(views, R.id.big_temp_bar, BatteryTemp.percentOfScale(celsius), BatteryTemp.colorFor(celsius));
+        String text = formatTemp(celsius);
+        views.setTextViewText(R.id.big_temp_text, text);
+        views.setContentDescription(R.id.big_temp_text, context.getString(R.string.big_temp_desc, text));
+    }
+
+    private static String formatTemp(double celsius) {
+        return BatteryTemp.format(celsius, BatteryTemp.usesFahrenheit(Locale.getDefault()));
+    }
+
     private static void setBar(RemoteViews views, int viewId, double percent) {
+        setBar(views, viewId, percent, DischargeEstimator.colorForPercent(percent));
+    }
+
+    private static void setBar(RemoteViews views, int viewId, double percent, int color) {
         views.setInt(viewId, "setImageLevel", (int) Math.round(percent * 100));
-        views.setInt(viewId, "setColorFilter", DischargeEstimator.colorForPercent(percent));
+        views.setInt(viewId, "setColorFilter", color);
     }
 
     private static void scheduleTick(Context context) {

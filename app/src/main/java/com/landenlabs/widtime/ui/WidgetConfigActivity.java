@@ -81,6 +81,7 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
     private TextView bgAlphaValue;
     private CheckBox showBatteryBar;
     private CheckBox showTimeLeftBar;
+    private CheckBox showTempBar;
     private CheckBox lowBatteryAlert;
     private CheckBox chargeAlerts;
     private Spinner speakStep;
@@ -397,9 +398,24 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
                 saved();
             }
         });
+        showTempBar = findViewById(R.id.show_temp_bar);
+        // Time left and temperature share the bottom slot: checking one unchecks the other
+        // (the prefs setters do the same, so the unchecked box's own save is a no-op).
         showTimeLeftBar.setOnCheckedChangeListener((b, checked) -> {
             if (!binding) {
                 WidgetPrefs.setShowTimeLeftBar(this, widgetId, checked);
+                if (checked) {
+                    showTempBar.setChecked(false);
+                }
+                saved();
+            }
+        });
+        showTempBar.setOnCheckedChangeListener((b, checked) -> {
+            if (!binding) {
+                WidgetPrefs.setShowTempBar(this, widgetId, checked);
+                if (checked) {
+                    showTimeLeftBar.setChecked(false);
+                }
                 saved();
             }
         });
@@ -601,6 +617,7 @@ public class WidgetConfigActivity extends AppCompatActivity implements CityListA
 
             showBatteryBar.setChecked(WidgetPrefs.getShowBatteryBar(this, widgetId));
             showTimeLeftBar.setChecked(WidgetPrefs.getShowTimeLeftBar(this, widgetId));
+            showTempBar.setChecked(WidgetPrefs.getShowTempBar(this, widgetId));
             lowBatteryAlert.setChecked(ChargeAlerts.isLowBatteryAlertEnabled(this, widgetId));
             chargeAlerts.setChecked(ChargeAlerts.isEnabled(this, widgetId));
             speakStep.setSelection(speakStepIndex(ChargeAlerts.getSpeakStep(this, widgetId)), false);

@@ -36,6 +36,12 @@
             android:layout_height="wrap_content"
             android:text="@string/time_left_bar_label" />
 
+        <CheckBox
+            android:id="@+id/show_temp_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/temp_bar_label" />
+
         <TextView
             style="@style/HelpTextStyle"
             android:text="@string/battery_bar_help" />

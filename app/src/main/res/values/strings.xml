@@ -21,11 +21,13 @@
     <string name="section_battery">Battery</string>
     <string name="battery_bar_label">Battery level bar (top)</string>
     <string name="time_left_bar_label">Battery time left bar (bottom, full = 24 h)</string>
+    <string name="temp_bar_label">Battery temperature bar (bottom, 20–60 °C)</string>
+    <string name="big_temp_desc">Battery temperature %1$s</string>
     <string name="big_battery_text">%1$d%%</string>
     <string name="big_battery_text_charging">⚡ %1$d%%</string>
     <string name="big_battery_desc">Battery %1$d%%</string>
     <string name="big_battery_desc_charging">Battery %1$d%%, charging</string>
-    <string name="battery_bar_help">Green above 60%, yellow 40–60%, red below 40%. Time left is estimated from how fast the battery drains while unplugged, so it fills in after the level drops a couple of percent. With no cities shown and only the level bar on, the whole widget becomes one large battery bar (brighter, with ⚡, while charging).</string>
+    <string name="battery_bar_help">Green above 60%, yellow 40–60%, red below 40%. Time left is estimated from how fast the battery drains while unplugged, so it fills in after the level drops a couple of percent. The temperature bar is empty at 20 °C and full at 60 °C (Android shuts the phone down at about 68 °C): green below 40 °C, yellow 40–45 °C, red from 45 °C. Time left and temperature share the bottom of the widget, so turning one on turns the other off. With no cities shown, the level and temperature bars become large bars that fill the widget (split in half when both are on; the level bar is brighter, with ⚡, while charging). The time-left bar keeps the normal layout.</string>
     <string name="section_charging">Charging</string>
     <string name="charge_alerts_label">Charging pings &amp; unplug alarm</string>
     <string name="charge_alerts_help">While charging the widget shows battery level, speed and current instead of the clocks. Pings every 2 min (5x), then every 5 min (5x), then every 10 min. When the charger is pulled, a 5 s alarm repeats every 5 min until you tap Stop (no alarm if it\'s pulled during a phone call). At 100% the widget shows the clocks again; after one final ping (or “Fully charged”), pings, speech and the unplug alarm stay quiet until the next charge. Tap the bell on the charging widget to mute charging sounds for the current charge only. Set per widget: sounds play once for the phone if any widget has them on, and only widgets with alerts on show the unplug alarm. Keeps a silent "Watching charger" notification.</string>

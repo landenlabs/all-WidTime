@@ -64,4 +64,32 @@
         <item name="android:background">#33FFFFFF</item>
         <item name="android:visibility">gone</item>
     </style>
+
+    <!-- Big-bar mode: textured track with a level-clipped fill (TimeWidgetProvider.setBigBar). -->
+    <style name="BigBarStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@drawable/battery_track_textured</item>
+        <item name="android:importantForAccessibility">no</item>
+        <item name="android:scaleType">fitXY</item>
+        <item name="android:src">@drawable/battery_bar_fill</item>
+    </style>
+
+    <style name="BigBarTextStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:autoSizeMaxTextSize">200sp</item>
+        <item name="android:autoSizeMinTextSize">8sp</item>
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:shadowColor">#CC000000</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">4</item>
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>

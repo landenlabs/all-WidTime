@@ -37,11 +37,14 @@ public final class BatteryStatus {
     public final boolean plugged;
     /** Estimated hours to empty, or {@code NaN} while still unknown. */
     public final double hoursLeft;
+    /** Battery temperature in °C, or {@code NaN} if the device doesn't report it. */
+    public final double temperatureC;
 
-    private BatteryStatus(int levelPercent, boolean plugged, double hoursLeft) {
+    private BatteryStatus(int levelPercent, boolean plugged, double hoursLeft, double temperatureC) {
         this.levelPercent = levelPercent;
         this.plugged = plugged;
         this.hoursLeft = hoursLeft;
+        this.temperatureC = temperatureC;
     }
 
     /** Reads the battery, records a discharge sample, and returns the current estimate. */
@@ -49,12 +52,14 @@ public final class BatteryStatus {
         Context app = context.getApplicationContext();
         Intent battery = app.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         if (battery == null) {
-            return new BatteryStatus(-1, false, Double.NaN);
+            return new BatteryStatus(-1, false, Double.NaN, Double.NaN);
         }
+        double tempC = BatteryTemp.fromTenths(
+                battery.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, Integer.MIN_VALUE));
         int rawLevel = battery.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
         int scale = battery.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
         if (rawLevel < 0 || scale <= 0) {
-            return new BatteryStatus(-1, false, Double.NaN);
+            return new BatteryStatus(-1, false, Double.NaN, tempC);
         }
         int level = Math.round(rawLevel * 100f / scale);
         boolean plugged = battery.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) != 0;
@@ -83,7 +88,7 @@ public final class BatteryStatus {
         if (Double.isNaN(hours) && !plugged) {
             hours = instantaneousHoursLeft(app);
         }
-        return new BatteryStatus(level, plugged, hours);
+        return new BatteryStatus(level, plugged, hours, tempC);
     }
 
     /** Charge remaining divided by current draw; many devices report 0 or MIN_VALUE for these. */

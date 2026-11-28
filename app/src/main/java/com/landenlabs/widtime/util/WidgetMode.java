@@ -14,13 +14,38 @@ public final class WidgetMode {
     private WidgetMode() {
     }
 
+    /** Which large bars fill the widget in place of the clocks; NONE keeps the normal layout. */
+    public enum BigBars {
+        NONE, BATTERY, TEMPERATURE, BOTH;
+
+        public boolean showBattery() {
+            return this == BATTERY || this == BOTH;
+        }
+
+        public boolean showTemperature() {
+            return this == TEMPERATURE || this == BOTH;
+        }
+    }
+
     /**
-     * Battery-only mode: no cities shown, only the level bar turned on (not the time-left bar),
-     * and a known battery level. The widget is then one large battery bar, whether charging or not.
+     * Big-bar mode: no cities shown and no time-left bar, with the level bar and/or the
+     * temperature bar turned on and known. One bar fills the widget; two split its height.
+     * The time-left and temperature bars are exclusive (temperature wins, see WidgetPrefs).
      */
-    public static boolean isBatteryOnly(int visibleCityCount, boolean showBatteryBar,
-                                        boolean showTimeLeftBar, int levelPercent) {
-        return visibleCityCount == 0 && showBatteryBar && !showTimeLeftBar && levelPercent >= 0;
+    public static BigBars bigBars(int visibleCityCount, boolean showBatteryBar, boolean showTimeLeftBar,
+                                  boolean showTempBar, int levelPercent, double temperatureC) {
+        if (visibleCityCount > 0 || (showTimeLeftBar && !showTempBar)) {
+            return BigBars.NONE;
+        }
+        boolean battery = showBatteryBar && levelPercent >= 0;
+        boolean temp = showTempBar && !Double.isNaN(temperatureC);
+        if (battery && temp) {
+            return BigBars.BOTH;
+        }
+        if (battery) {
+            return BigBars.BATTERY;
+        }
+        return temp ? BigBars.TEMPERATURE : BigBars.NONE;
     }
 
     /** Blends {@code argb} toward white by {@code fraction} (0 = unchanged, 1 = white); keeps alpha. */
