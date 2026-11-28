@@ -10,8 +10,8 @@ android {
         applicationId = "com.landenlabs.widtime"
         minSdk = 26
         targetSdk = 37
-        versionCode = 61114
-        versionName = "6.11.14"
+        versionCode = 61125
+        versionName = "6.11.25"
     }
 
     // Release signing is opt-in so a plain `assembleRelease` still works (unsigned)

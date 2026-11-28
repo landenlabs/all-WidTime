@@ -1,8 +1,8 @@
 <table border="0">
   <tr>
     <td>
-      <!-- VERSION -->v6.11.14<br>
-      <!-- DATE -->14-Nov-2026<br>
+      <!-- VERSION -->v6.11.25<br>
+      <!-- DATE -->27-Nov-2026<br>
       Android (Java)<br>
       <a href="https://github.com/landenlabs/all-WidTime">Repo</a>
     </td>

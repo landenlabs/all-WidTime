@@ -18,7 +18,7 @@ android {
         applicationId = "com.landenlabs.widtime"
         minSdk = 30         // Wear OS 3, the first version on Galaxy Watch (Watch4).
         targetSdk = 36
-        versionCode = 1_000_000_000 + phoneConfig.versionCode
+        versionCode = 61125_000_000_000 + phoneConfig.versionCode
         versionName = phoneConfig.versionName
     }
 
